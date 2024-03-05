@@ -6,3 +6,5 @@ set(CMAKE_CXX_STANDARD 17)
 add_executable(untitled1 main.cpp
         LidarServer.cpp
         LidarServer.h)
+
+add_subdirectory(Google_tests)
