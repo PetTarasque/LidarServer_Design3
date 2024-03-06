@@ -14,18 +14,23 @@ class LidarServer {
 private:
     string m_filePath;
     vector<Point> points;
-
+    map<string, double> m_positions;
+    pair<int, int> right_arc = {330, 30};
 
 public:
     explicit LidarServer(string filePath);
-    map<string, double> calculatePositions();
+    void calculatePositions();
     double calculateRightWallDistance();
     void cleanValues();
     void deleteValuesCollidingWithRobot();
     void deleteAbhorrentValues();
 
+    static double angleOfArc(pair<double, double> arc);
+    static double calculateAverageDistance(const std::vector<Point>& points);
     void readLidar();
     vector<Point> getPoints();
+    map<string, double> getPositions();
+    vector<Point> getAngleIntervals(pair<int, int> arc);
 };
 
 

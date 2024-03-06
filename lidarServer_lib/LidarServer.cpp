@@ -31,19 +31,22 @@ void LidarServer::readLidar() {
     inFile.close();
 };
 
+map<string, double> LidarServer::getPositions(){
+    return m_positions;
+};
 
 vector<Point> LidarServer::getPoints(){
     return points;
 };
 
-map<string, double> LidarServer::calculatePositions() {
+void LidarServer::calculatePositions() {
     map<string, double> positions;
     positions["rightWall"] = calculateRightWallDistance();
     positions["leftWall"] = 412412.223;
     positions["frontWall"] = 76542.21;
     positions["rearWall"] = 7432.4234;
     positions["angle"] = 3764.21;
-    return positions;
+    m_positions = positions;
 }
 
 void LidarServer::cleanValues(){
@@ -80,5 +83,44 @@ void LidarServer::deleteValuesCollidingWithRobot(){
 };
 
 double LidarServer::calculateRightWallDistance() {
-    return 16.5;
-};
+    vector<Point> filteredPoint = getAngleIntervals(right_arc);
+    double Angle = angleOfArc(right_arc);
+    //double A =
+
+    return calculateAverageDistance(filteredPoint);
+}
+
+double LidarServer::calculateAverageDistance(const std::vector<Point>& points) {
+    double sum = 0.0;
+    for (const auto& point : points) {
+        sum += point.distance;
+    }
+    return points.empty() ? 0.0 : sum / points.size();
+}
+
+double LidarServer::angleOfArc(pair<double, double> arc){
+    int startInterval = arc.first;
+    int endInterval = arc.second;
+    double Angle;
+    if (startInterval> endInterval){
+        Angle = (360 - startInterval) + endInterval;
+    } else {
+        Angle = endInterval - startInterval;
+    }
+    return Angle;
+}
+
+vector<Point> LidarServer::getAngleIntervals(pair<int, int> arc){
+    vector<Point> pointsOfInterval;
+    int startInterval = arc.first;
+    int endInterval = arc.second;
+    if(startInterval > endInterval){
+        //This distinction is necessary if for example the start of the interval is 345 and the end is 15
+        copy_if(points.begin(), points.end(), std::back_inserter(pointsOfInterval),
+                     [&startInterval, &endInterval](const Point& point) { return point.angle >= startInterval || point.angle <= endInterval;});
+    } else {
+        copy_if(points.begin(), points.end(), std::back_inserter(pointsOfInterval),
+                [&startInterval, &endInterval](const Point& point) { return point.angle >= startInterval && point.angle <= endInterval;});
+    }
+    return pointsOfInterval;
+}
