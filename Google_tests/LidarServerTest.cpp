@@ -140,15 +140,15 @@ TEST_F(LidarServerFixture, middleOfArc){
 TEST_F(LidarServerFixture, calculateHeightOfTriangle){
     double height = lidarServer->calculateHeightTriangle(4, 6, 48);
     bool inRange = checkIfWithinPrecisionRange(4.0, height, 0.1);
-    ASSERT_TRUE(inRange) << "Expected : " << 4.0 << " Actual : " << height << endl;
+    ASSERT_TRUE(inRange) << "Expected : " << 4.0 << endl<<"Actual : " << height << endl;
 
     height = lidarServer->calculateHeightTriangle(120, 100, 48);
     inRange = checkIfWithinPrecisionRange(97.64, height, 0.1);
-    ASSERT_TRUE(inRange) << "Expected : " << 97.64 << " Actual : " << height << endl;
+    ASSERT_TRUE(inRange) << "Expected : " << 97.64 << endl<< "Actual : " << height << endl;
 
     height = lidarServer->calculateHeightTriangle(160, 237, 60);
     inRange = checkIfWithinPrecisionRange(157, height, 1);
-    ASSERT_TRUE(inRange) << "Expected : " << 157 << " Actual : " << height << endl;
+    ASSERT_TRUE(inRange) << "Expected : " << 157 << endl<<"Actual : " << height << endl;
 }
 
 TEST_F(LidarServerFixture, moduloAngle){
@@ -187,9 +187,14 @@ TEST_F(LidarServerFixture, splittingAnAngleInSubIntervals){
     ASSERT_EQ(actualInterval, calculatedSubInterval);
 }
 
+TEST_F(LidarServerFixture, calculateRightWallDistance){
+    pair<double, double> rightWallPositions = lidarServer->calculateRightWallPositions();;
+    bool isWithinRange = checkIfWithinPrecisionRange(RIGHT_WALL, rightWallPositions.first, PRECISION_VALUE);
+    ASSERT_TRUE(isWithinRange)<<"Expected : " << RIGHT_WALL << "+-"<< PRECISION_VALUE << " Received : "<<rightWallPositions.first<<endl;;
+}
 
-TEST_F(LidarServerFixture, calculatesRightWallDistance){
-    double rightWallDistance = lidarServer->calculateRightWallDistance();;
-    bool isWithinRange = checkIfWithinPrecisionRange(RIGHT_WALL, rightWallDistance, PRECISION_VALUE);
-    ASSERT_TRUE(isWithinRange)<<"Expected : " << RIGHT_WALL << "+-"<< PRECISION_VALUE << " Received : "<<rightWallDistance<<endl;;
+TEST_F(LidarServerFixture, calculateRightWallAngle){
+    pair<double, double> rightWallPositions = lidarServer->calculateRightWallPositions();;
+    bool isWithinRange = checkIfWithinPrecisionRange(ANGLE, rightWallPositions.second, 1);
+    ASSERT_TRUE(isWithinRange)<<"Expected : " << ANGLE << "+-"<< 1 << " Received : "<<rightWallPositions.second<<endl;;
 }

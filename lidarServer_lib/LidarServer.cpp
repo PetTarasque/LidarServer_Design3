@@ -41,11 +41,12 @@ vector<Point> LidarServer::getPoints(){
 
 void LidarServer::calculatePositions() {
     map<string, double> positions;
-    positions["rightWall"] = calculateRightWallDistance();
+    pair<double, double> rightWallPositions = calculateRightWallPositions();
+    positions["rightWall"] = rightWallPositions.first;
     positions["leftWall"] = 412412.223;
     positions["frontWall"] = 76542.21;
     positions["rearWall"] = 7432.4234;
-    positions["angle"] = 3764.21;
+    positions["angle"] = rightWallPositions.second;
     m_positions = positions;
 }
 
@@ -136,21 +137,6 @@ pair<double, double> LidarServer::splitArcInSubInterval(pair<double, double> arc
     return {moduloAngle(startOfSection), moduloAngle(endOfSection)};
 }
 
-double LidarServer::calculateRightWallDistance() {
-    //the logic for calculating arcs should be more generic, and should detect if one of the interval is fucked
-    vector<Point> filteredPoint = getPointsInInterval(right_arc);
-
-    pair<double, double> samplingForFirstPoint= splitArcInSubInterval(right_arc, 6, 2);
-    double A = calculateAverageDistance(getPointsInInterval(samplingForFirstPoint));
-
-    pair<double, double> samplingForSecondPoint= splitArcInSubInterval(right_arc, 6, 5);
-    double B = calculateAverageDistance(getPointsInInterval(samplingForSecondPoint));
-
-    double Angle = angleBetweenArcs(samplingForFirstPoint, samplingForSecondPoint);
-
-    return calculateHeightTriangle(A, B, Angle);
-}
-
 double LidarServer::angleBetweenArcs(pair<double, double> firstArc, pair<double, double> secondArc){
     double middleFirstArc = middleOfArc(firstArc);
     double middleSecondArc = middleOfArc(secondArc);
@@ -165,6 +151,26 @@ double LidarServer::middleOfArc(pair<double, double> arc){
     }
 };
 
+pair<double, double> LidarServer::calculateRightWallPositions() {
+    //
+    //the logic for calculating arcs should be more generic, and should detect if one of the interval is fucked
+    //
+    vector<Point> filteredPoint = getPointsInInterval(right_arc);
+
+    pair<double, double> samplingForFirstPoint= splitArcInSubInterval(right_arc, 6, 2);
+    double A = calculateAverageDistance(getPointsInInterval(samplingForFirstPoint));
+
+    pair<double, double> samplingForSecondPoint= splitArcInSubInterval(right_arc, 6, 5);
+    double B = calculateAverageDistance(getPointsInInterval(samplingForSecondPoint));
+
+    double Angle = angleBetweenArcs(samplingForFirstPoint, samplingForSecondPoint);
+
+    double triangleHeight = calculateHeightTriangle(A, B, Angle);//angle radiant
+    double deviation = calculateDeviation(A, B, Angle, samplingForFirstPoint.second);
+
+    return {triangleHeight, deviation};
+}
+
 double LidarServer::calculateHeightTriangle(double A, double B, double angle){
     double angleRadiant = angle * (M_PI / 180.0);
     double Area = 0.5 * A * B * sin(angleRadiant);
@@ -173,3 +179,20 @@ double LidarServer::calculateHeightTriangle(double A, double B, double angle){
     return heightOfTriangle;
 }
 
+double LidarServer::calculateDeviation(double A, double B, double angle_AtoB, double angleA){
+    double angleRadiant_AtoB = angle_AtoB * (M_PI / 180.0);
+    double C = sqrt(A*A+ B*B- 2*A*B*cos(angleRadiant_AtoB));
+    double angleBRadiant = asin(B*sin(angleRadiant_AtoB)/C);
+    double angle_AToh = 90-angleBRadiant* (180.0 / M_PI);;
+    return (360-angleA) - angle_AToh; //this angle adjustment is not generic
+}
+
+/**
+ * double LidarServer::calculateHeightTriangle(double A, double B, double angle){
+    double angleRadiant = angle * (M_PI / 180.0);
+    double Area = 0.5 * A * B * sin(angleRadiant);
+    double base = sqrt(A*A+ B*B- 2*A*B*cos(angleRadiant));
+    double heightOfTriangle = 2 * Area / base;
+    return heightOfTriangle;
+}
+ */
