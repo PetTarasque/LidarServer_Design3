@@ -39,6 +39,11 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for the subdirectory.
+  include("/Users/hugopj/CLionProjects/lidarServer/cmake-build-debug/lidarServer_lib/cmake_install.cmake")
+endif()
+
+if(NOT CMAKE_INSTALL_LOCAL_ONLY)
+  # Include the install script for the subdirectory.
   include("/Users/hugopj/CLionProjects/lidarServer/cmake-build-debug/Google_tests/cmake_install.cmake")
 endif()
 

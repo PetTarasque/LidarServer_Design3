@@ -1,3 +1,12 @@
 # ninja log v5
-10	1527	1709578607525135678	CMakeFiles/untitled1.dir/main.cpp.o	9ef647b632eb7693
 1528	1659	1709578607659577959	untitled1	80dc2b4a26cdefb8
+7	2469	1709685621724440515	lidarServer_lib/CMakeFiles/lidarServer_lib.dir/LidarServer.cpp.o	b140a1e3b6c854b2
+2474	2817	1709685622084096000	lidarServer_lib/liblidarServer_lib.a	ce664296cf9f6cb1
+6	3476	1709685622726578698	Google_tests/lib/googletest/CMakeFiles/gtest_main.dir/src/gtest_main.cc.o	b1ae1424940f1c9f
+8	3666	1709685622921258293	Google_tests/CMakeFiles/Google_Tests_run.dir/LidarServerTest.cpp.o	9dc85f169f7338eb
+2	9078	1709685628293782730	Google_tests/lib/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.o	906c02926fd481b4
+9079	9245	1709685628512761000	lib/libgtest.a	eb976c0386e937cc
+9245	9327	1709685628595365000	lib/libgtest_main.a	d16686b8efe93d70
+9327	9528	1709685628783600330	Google_tests/Google_Tests_run	f7ea9758707a8ae5
+9	1426	1709685647009981150	Google_tests/CMakeFiles/Google_Tests_run.dir/LidarServerTest.cpp.o	9dc85f169f7338eb
+1426	1545	1709685647127185723	Google_tests/Google_Tests_run	f7ea9758707a8ae5

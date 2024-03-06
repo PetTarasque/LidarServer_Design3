@@ -12,7 +12,7 @@ class LidarServer {
 private:
     string m_filePath;
 public:
-    LidarServer(string filePath);
+    explicit LidarServer(string filePath);
     vector<int> calculatePositions();
 };
 

@@ -349,6 +349,15 @@ gtest_force_shared_crt:BOOL=OFF
 gtest_hide_internal_symbols:BOOL=OFF
 
 //Value Computed by CMake
+lidarServer_lib_BINARY_DIR:STATIC=/Users/hugopj/CLionProjects/lidarServer/cmake-build-debug/lidarServer_lib
+
+//Value Computed by CMake
+lidarServer_lib_IS_TOP_LEVEL:STATIC=OFF
+
+//Value Computed by CMake
+lidarServer_lib_SOURCE_DIR:STATIC=/Users/hugopj/CLionProjects/lidarServer/lidarServer_lib
+
+//Value Computed by CMake
 untitled1_BINARY_DIR:STATIC=/Users/hugopj/CLionProjects/lidarServer/cmake-build-debug
 
 //Value Computed by CMake
@@ -484,7 +493,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=5
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=6
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
