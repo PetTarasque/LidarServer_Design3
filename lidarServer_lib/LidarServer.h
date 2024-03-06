@@ -26,12 +26,16 @@ public:
     void deleteAbhorrentValues();
 
     static double angleOfArc(pair<double, double> arc);
+    static pair<double, double> splitArcInSubInterval(pair<double, double> arc, int numberOfSections, int sectionSelected);
     static double calculateAverageDistance(const std::vector<Point>& points);
     void readLidar();
     vector<Point> getPoints();
     map<string, double> getPositions();
     vector<Point> getPointsInInterval(pair<int, int> arc);
-    double calculateHeightTriangle(double A, double B, double angle);
+    static double calculateHeightTriangle(double A, double B, double angle);
+    static double moduloAngle(double angle);
+    static double angleBetweenArcs(pair<double, double> firstArc, pair<double, double> secondArc);
+    static double middleOfArc(pair<double, double> arc);
 };
 
 

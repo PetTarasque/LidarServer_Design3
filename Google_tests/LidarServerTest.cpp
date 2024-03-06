@@ -21,6 +21,7 @@ protected:
     {
         lidarServer = new LidarServer(FILE_PATH);
         lidarServer->readLidar();
+        lidarServer->cleanValues();
     }
 
     virtual void TearDown() {
@@ -47,7 +48,9 @@ TEST_F(LidarServerFixture, readLidarFetchesValues){
 }
 
 TEST_F(LidarServerFixture, readLidarReturnsAllAngles){
-    vector<Point> returnedPoints = lidarServer->getPoints();
+    LidarServer* serverNotCleaned = new LidarServer(FILE_PATH);
+    serverNotCleaned->readLidar();
+    vector<Point> returnedPoints = serverNotCleaned->getPoints();
     ASSERT_EQ(NUMBER_OF_ANGLES, returnedPoints.size());
 }
 
@@ -63,14 +66,14 @@ TEST_F(LidarServerFixture, calculatePositionsUpdatesPositions){
 }
 
 TEST_F(LidarServerFixture, cleanValuesEliminatesSomePoints){
-    lidarServer->cleanValues();
-    vector<Point> returnedPoints = lidarServer->getPoints();
+    LidarServer* serverNotCleaned = new LidarServer(FILE_PATH);
+    serverNotCleaned->readLidar();
+    serverNotCleaned->cleanValues();
+    vector<Point> returnedPoints = serverNotCleaned->getPoints();
     ASSERT_TRUE(NUMBER_OF_ANGLES >= returnedPoints.size());
 }
 
 TEST_F(LidarServerFixture, cleanPointCollidingWithRobot){
-    lidarServer->cleanValues();
-
     vector<Point> returnedPoints = lidarServer->getPoints();
     ASSERT_FALSE(containsAngle(returnedPoints, 125));
 }
@@ -111,6 +114,29 @@ TEST_F(LidarServerFixture, angleInArc){
     ASSERT_EQ(270.0, lidarServer->angleOfArc({30.0, 300.0}));
 }
 
+TEST_F(LidarServerFixture, splitArcInSubInterval){
+    pair<double, double> measuredArc = lidarServer->splitArcInSubInterval({330.0, 30.0}, 6, 2);
+    pair<double, double> expectedArc = {340.0, 350.0};
+    ASSERT_EQ(expectedArc, measuredArc);
+
+    measuredArc = lidarServer->splitArcInSubInterval({330.0, 30.0}, 6, 5);
+    expectedArc = {10.0, 20.0};
+    ASSERT_EQ(expectedArc, measuredArc);
+
+    measuredArc = lidarServer->splitArcInSubInterval({240.0, 290.0}, 5, 2);
+    expectedArc = {250.0, 260.0};
+    ASSERT_EQ(expectedArc, measuredArc);
+}
+
+TEST_F(LidarServerFixture, middleOfArc){
+    ASSERT_EQ(345, lidarServer->middleOfArc({340, 350}));
+    ASSERT_EQ(20, lidarServer->middleOfArc({0, 40}));
+    ASSERT_EQ(5, lidarServer->middleOfArc({350, 20}));
+    ASSERT_EQ(315, lidarServer->middleOfArc({300, 330}));
+    ASSERT_EQ(125, lidarServer->middleOfArc({100, 150}));
+    ASSERT_EQ(0, lidarServer->middleOfArc({300, 60}));
+}
+
 TEST_F(LidarServerFixture, calculateHeightOfTriangle){
     double height = lidarServer->calculateHeightTriangle(4, 6, 48);
     bool inRange = checkIfWithinPrecisionRange(4.0, height, 0.1);
@@ -125,10 +151,45 @@ TEST_F(LidarServerFixture, calculateHeightOfTriangle){
     ASSERT_TRUE(inRange) << "Expected : " << 157 << " Actual : " << height << endl;
 }
 
+TEST_F(LidarServerFixture, moduloAngle){
+    ASSERT_EQ(200, lidarServer->moduloAngle(200));
+    ASSERT_EQ(80, lidarServer->moduloAngle(440));
+    ASSERT_EQ(30, lidarServer->moduloAngle(390));
+    ASSERT_EQ(20, lidarServer->moduloAngle(740));
+}
+
+TEST_F(LidarServerFixture, angleBetweenArcs){
+    double calculatedAngleBetweenArcs = lidarServer->angleBetweenArcs({330, 340}, {10, 20});
+    ASSERT_EQ(40, calculatedAngleBetweenArcs);
+
+    calculatedAngleBetweenArcs = lidarServer->angleBetweenArcs({300, 310}, {320, 330});
+    ASSERT_EQ(20, calculatedAngleBetweenArcs);
+
+    calculatedAngleBetweenArcs = lidarServer->angleBetweenArcs({20, 50}, {320, 330});
+    ASSERT_EQ(290, calculatedAngleBetweenArcs);
+}
+
+TEST_F(LidarServerFixture, splittingAnAngleInSubIntervals){
+    pair<double, double> calculatedSubInterval = lidarServer->splitArcInSubInterval({330, 30}, 6, 2);
+    pair<double, double> actualInterval = {340, 350};
+    ASSERT_EQ(actualInterval, calculatedSubInterval);
+
+    calculatedSubInterval = lidarServer->splitArcInSubInterval({330, 30}, 6, 5);
+    actualInterval = {10, 20};
+    ASSERT_EQ(actualInterval, calculatedSubInterval);
+
+    calculatedSubInterval = lidarServer->splitArcInSubInterval({300, 330}, 6, 2);
+    actualInterval = {305, 310};
+    ASSERT_EQ(actualInterval, calculatedSubInterval);
+
+    calculatedSubInterval = lidarServer->splitArcInSubInterval({10, 30}, 4, 1);
+    actualInterval = {10, 15};
+    ASSERT_EQ(actualInterval, calculatedSubInterval);
+}
+
 
 TEST_F(LidarServerFixture, calculatesRightWallDistance){
     double rightWallDistance = lidarServer->calculateRightWallDistance();;
-    //verify logic of wall distances by hand-crafting an example
     bool isWithinRange = checkIfWithinPrecisionRange(RIGHT_WALL, rightWallDistance, PRECISION_VALUE);
     ASSERT_TRUE(isWithinRange)<<"Expected : " << RIGHT_WALL << "+-"<< PRECISION_VALUE << " Received : "<<rightWallDistance<<endl;;
 }
