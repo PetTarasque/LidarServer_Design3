@@ -36,6 +36,7 @@ std::vector<Point> loadData(const std::string& filename) {
         return points;
     }
 
+
     Point point;
     while (inFile >> point.distance >> point.angle) {
         points.push_back(point);
@@ -46,6 +47,7 @@ std::vector<Point> loadData(const std::string& filename) {
 }
 
 int main() {
+    /**
     while (false) {
         std::vector<Point> points = {{3.0, 45.0},
                                      {5.0, 60.0},
@@ -140,6 +142,19 @@ int main() {
 //            std::cout << "Distance: " << point.distance << ", Angle: " << point.angle << "\n";
 //        }
     }
+    */
+
+    std::vector<Point> points = loadData("../testData/box.txt");
+
+    if(!points.empty()){
+        std::cout<< "it works"<<std::endl;
+    }
+
+//    std::ifstream inFile("./testData/box.txt");
+//
+//    if (!inFile) {
+//        std::cerr << "Error: Couldn't open file for reading\n";
+//    }
 
     return 0;
 }

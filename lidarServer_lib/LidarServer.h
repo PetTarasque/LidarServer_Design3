@@ -6,14 +6,26 @@
 #define UNTITLED1_LIDARSERVER_H
 
 #include <iostream>
+#include "Point.h"
+
 using namespace std;
 
 class LidarServer {
 private:
     string m_filePath;
+    vector<Point> points;
+
+
 public:
     explicit LidarServer(string filePath);
-    vector<int> calculatePositions();
+    map<string, double> calculatePositions();
+    double calculateRightWallDistance();
+    void cleanValues();
+    void deleteValuesCollidingWithRobot();
+    void deleteAbhorrentValues();
+
+    void readLidar();
+    vector<Point> getPoints();
 };
 
 

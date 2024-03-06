@@ -1,9 +1,3 @@
-Droite : 16
-Devant : 31
-Gauche: 27
-Derriere : 53
-Angle : 10 vers la droite
-
 0.699982 161
 1.41 162
 2.12 163

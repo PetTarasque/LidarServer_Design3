@@ -6,6 +6,7 @@ set(HEADER_FILES
 
 set(SOURCE_FILES
         LidarServer.cpp
+        Point.h
 )
 
 add_library(lidarServer_lib STATIC ${SOURCE_FILES} ${HEADER_FILES})
