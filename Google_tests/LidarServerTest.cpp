@@ -30,9 +30,9 @@ protected:
     LidarServer* lidarServer;
 };
 
-bool checkIfWithinPrecisionRange(double referenceValue, double returnedValue){
+bool checkIfWithinPrecisionRange(double referenceValue, double returnedValue, double precision){
     //check if the returned value is within PRECISION of the referenceValue
-    return referenceValue-PRECISION_VALUE < returnedValue && referenceValue+PRECISION_VALUE > returnedValue;
+    return referenceValue-precision < returnedValue && referenceValue+precision > returnedValue;
 }
 
 bool containsAngle(const vector<Point>& returnedPoints, int angle){
@@ -78,7 +78,7 @@ TEST_F(LidarServerFixture, cleanPointCollidingWithRobot){
 TEST_F(LidarServerFixture, angleIntervalReturnsPointsWithinRange){
     int StartOfAngleInterval = 15;
     int EndOfAngleInterval = 45;
-    vector<Point> filteredPoints = lidarServer->getAngleIntervals({StartOfAngleInterval, EndOfAngleInterval});
+    vector<Point> filteredPoints = lidarServer->getPointsInInterval({StartOfAngleInterval, EndOfAngleInterval});
 
     bool allAnglesWithinRange = true;
     for (const Point& point : filteredPoints){
@@ -93,7 +93,7 @@ TEST_F(LidarServerFixture, angleIntervalReturnsPointsWithinRange){
 TEST_F(LidarServerFixture, angleIntervalReturnsPointsWithinRangeWhenPassing360){
     int StartOfAngleInterval = 330;
     int EndOfAngleInterval = 30;
-    vector<Point> filteredPoints = lidarServer->getAngleIntervals({StartOfAngleInterval, EndOfAngleInterval});
+    vector<Point> filteredPoints = lidarServer->getPointsInInterval({StartOfAngleInterval, EndOfAngleInterval});
 
     bool allAnglesWithinRange = true;
     for (const Point& point : filteredPoints){
@@ -111,12 +111,20 @@ TEST_F(LidarServerFixture, angleInArc){
     ASSERT_EQ(270.0, lidarServer->angleOfArc({30.0, 300.0}));
 }
 
-//
-//
-//TEST_F(LidarServerFixture, calculatesRightWallDistance){
-//    lidarServer->calculatePositions();
-//    map<string, double> positions = lidarServer->getPositions();
-//
-//    bool isWithinRange = checkIfWithinPrecisionRange(RIGHT_WALL, positions["rightWall"]);
-//    ASSERT_TRUE(isWithinRange)<<"Expected : " << RIGHT_WALL << "+-"<< PRECISION_VALUE << " Received : "<<positions["rightWall"]<<endl;;
-//}
+TEST_F(LidarServerFixture, calculateHeightOfTriangle){
+    double height = lidarServer->calculateHeightTriangle(4, 6, 48);
+    bool inRange = checkIfWithinPrecisionRange(4.0, height, 0.1);
+    ASSERT_TRUE(inRange) << "Expected : " << 4.0 << " Actual : " << height << endl;
+
+    height = lidarServer->calculateHeightTriangle(120, 100, 48);
+    inRange = checkIfWithinPrecisionRange(97.64, height, 0.1);
+    ASSERT_TRUE(inRange) << "Expected : " << 97.64 << " Actual : " << height << endl;
+}
+
+
+TEST_F(LidarServerFixture, calculatesRightWallDistance){
+    double rightWallDistance = lidarServer->calculateRightWallDistance();;
+    //verify logic of wall distances by hand-crafting an example
+    bool isWithinRange = checkIfWithinPrecisionRange(RIGHT_WALL, rightWallDistance, PRECISION_VALUE);
+    ASSERT_TRUE(isWithinRange)<<"Expected : " << RIGHT_WALL << "+-"<< PRECISION_VALUE << " Received : "<<rightWallDistance<<endl;;
+}

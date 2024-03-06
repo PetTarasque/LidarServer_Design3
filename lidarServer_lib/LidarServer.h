@@ -30,7 +30,8 @@ public:
     void readLidar();
     vector<Point> getPoints();
     map<string, double> getPositions();
-    vector<Point> getAngleIntervals(pair<int, int> arc);
+    vector<Point> getPointsInInterval(pair<int, int> arc);
+    double calculateHeightTriangle(double A, double B, double angle);
 };
 
 

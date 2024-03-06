@@ -82,14 +82,6 @@ void LidarServer::deleteValuesCollidingWithRobot(){
     }), points.end());
 };
 
-double LidarServer::calculateRightWallDistance() {
-    vector<Point> filteredPoint = getAngleIntervals(right_arc);
-    double Angle = angleOfArc(right_arc);
-    //double A =
-
-    return calculateAverageDistance(filteredPoint);
-}
-
 double LidarServer::calculateAverageDistance(const std::vector<Point>& points) {
     double sum = 0.0;
     for (const auto& point : points) {
@@ -110,7 +102,7 @@ double LidarServer::angleOfArc(pair<double, double> arc){
     return Angle;
 }
 
-vector<Point> LidarServer::getAngleIntervals(pair<int, int> arc){
+vector<Point> LidarServer::getPointsInInterval(pair<int, int> arc){
     vector<Point> pointsOfInterval;
     int startInterval = arc.first;
     int endInterval = arc.second;
@@ -124,3 +116,37 @@ vector<Point> LidarServer::getAngleIntervals(pair<int, int> arc){
     }
     return pointsOfInterval;
 }
+
+double LidarServer::calculateRightWallDistance() {
+    vector<Point> filteredPoint = getPointsInInterval(right_arc);
+    double Angle = angleOfArc(right_arc);
+    cout << "Angle : "<< Angle<<endl;
+    double startFirstArc = (right_arc.first + Angle/6);
+    double startFirstArcAdjusted = startFirstArc > 360 ? startFirstArc - 360 : startFirstArc;
+    double endFirstArc = (right_arc.first + 2*Angle/6);
+    double endFirstArcAdjusted = endFirstArc > 360 ? endFirstArc - 360 : endFirstArc;
+    pair<double, double> firstPointOfTriangle= {startFirstArcAdjusted, endFirstArcAdjusted };
+    cout << "firstPointOfTriangle : "<< startFirstArcAdjusted << " " << endFirstArcAdjusted <<endl;
+    double A = calculateAverageDistance(getPointsInInterval(firstPointOfTriangle));
+    cout << "A : "<< A<<endl;
+
+    double startSecondArc = (right_arc.first + 4*Angle/6);
+    double startSecondArcAdjusted = startSecondArc > 360 ? startSecondArc - 360 : startSecondArc;
+    double endSecondArc = (right_arc.first + 5*Angle/6);
+    double endSecondArcAdjusted = endSecondArc > 360 ? endSecondArc - 360 : endSecondArc;
+    pair<double, double> secondPointOfTriangle= {startSecondArcAdjusted, endSecondArcAdjusted };
+    cout << "secondPointOfTriangle : "<< startSecondArcAdjusted << " " << endSecondArcAdjusted <<endl;
+    double B = calculateAverageDistance(getPointsInInterval(secondPointOfTriangle));
+    cout << "B : "<< B <<endl;
+
+    return calculateHeightTriangle(A, B, Angle);
+}
+
+double LidarServer::calculateHeightTriangle(double A, double B, double angle){
+    double angleRadiant = angle * (M_PI / 180.0);
+    double Area = 0.5 * A * B * sin(angleRadiant);
+    double base = sqrt(A*A+ B*B- 2*A*B*cos(angleRadiant));
+    double heightOfTriangle = 2 * Area / base;
+    return heightOfTriangle;
+}
+
