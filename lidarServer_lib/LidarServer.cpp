@@ -118,9 +118,9 @@ vector<Point> LidarServer::getPointsInInterval(pair<int, int> arc){
 }
 
 double LidarServer::calculateRightWallDistance() {
+    //lets move this logic in another class, so it is less prone to mistakes
     vector<Point> filteredPoint = getPointsInInterval(right_arc);
     double Angle = angleOfArc(right_arc);
-    cout << "Angle : "<< Angle<<endl;
     double startFirstArc = (right_arc.first + Angle/6);
     double startFirstArcAdjusted = startFirstArc > 360 ? startFirstArc - 360 : startFirstArc;
     double endFirstArc = (right_arc.first + 2*Angle/6);
@@ -138,6 +138,11 @@ double LidarServer::calculateRightWallDistance() {
     cout << "secondPointOfTriangle : "<< startSecondArcAdjusted << " " << endSecondArcAdjusted <<endl;
     double B = calculateAverageDistance(getPointsInInterval(secondPointOfTriangle));
     cout << "B : "<< B <<endl;
+
+    //this is a propotype prone to generate errors when passing the 360 degrees mark
+    //this should be automated somewhere and have its own tests
+    Angle = 30;
+    cout << "Angle : "<< Angle<<endl;
 
     return calculateHeightTriangle(A, B, Angle);
 }

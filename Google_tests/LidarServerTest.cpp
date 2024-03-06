@@ -119,6 +119,10 @@ TEST_F(LidarServerFixture, calculateHeightOfTriangle){
     height = lidarServer->calculateHeightTriangle(120, 100, 48);
     inRange = checkIfWithinPrecisionRange(97.64, height, 0.1);
     ASSERT_TRUE(inRange) << "Expected : " << 97.64 << " Actual : " << height << endl;
+
+    height = lidarServer->calculateHeightTriangle(160, 237, 60);
+    inRange = checkIfWithinPrecisionRange(157, height, 1);
+    ASSERT_TRUE(inRange) << "Expected : " << 157 << " Actual : " << height << endl;
 }
 
 
