@@ -144,7 +144,7 @@ int main() {
     }
     */
 
-    std::vector<Point> points = loadData("../testData/box.txt");
+    std::vector<Point> points = loadData(".b./testData/box.txt");
 
     if(!points.empty()){
         std::cout<< "it works"<<std::endl;

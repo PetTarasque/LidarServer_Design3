@@ -33,7 +33,7 @@ public:
     map<string, double> getPositions();
     vector<Point> getPointsInInterval(pair<int, int> arc);
     static double calculateHeightTriangle(double A, double B, double angle);
-    static double calculateDeviation(double A, double B, double angle, double angleA);
+    static double calculateDeviation(double A, double B, double angleB, double angle);
     static double moduloAngle(double angle);
     static double angleBetweenArcs(pair<double, double> firstArc, pair<double, double> secondArc);
     static double middleOfArc(pair<double, double> arc);
