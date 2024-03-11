@@ -42,12 +42,11 @@ vector<Point> LidarServer::getPoints(){
 void LidarServer::calculatePositions() {
     map<string, double> positions;
     pair<double, double> rightWallPositions = calculateRightWallPositions();
+    double deviationAngle = rightWallPositions.second;
     positions["rightWall"] = rightWallPositions.first;
-    positions["leftWall"] = 412412.223;
-    positions["frontWall"] = 76542.21; //TODO
-    positions["rearWall"] = 7432.4234;
+    positions["frontWall"] = calculateFrontWallDistance(deviationAngle);
     //positions["cylinderDistance"] = 7432.4234; ?
-    positions["angle"] = rightWallPositions.second;
+    positions["angle"] = deviationAngle;
     m_positions = positions;
 }
 
@@ -161,7 +160,8 @@ double LidarServer::middleOfArc(pair<double, double> arc){
 };
 
 pair<double, double> LidarServer::calculateRightWallPositions() {
-    /**should have a logic to deal with points that aren't valid.
+    /** TODO
+     * should have a logic to deal with points that aren't valid.
      * maybe have 3 triangles taken across the wall and compare them
      * an arc sample should also verify if there's enough points for the sample, and if not, increase the aperture of the angle
      * or take another point
@@ -182,6 +182,14 @@ pair<double, double> LidarServer::calculateRightWallPositions() {
 
     return {triangleHeight, deviation};
 }
+
+double LidarServer::calculateFrontWallDistance(double deviationAngle){
+    //this is the distance from the wall in front of the vehicle
+    pair<double, double> adjustedFrontalArc = {frontal_arc.first-deviationAngle, frontal_arc.second-deviationAngle};
+    vector<Point> frontalPoints = getPointsInInterval(adjustedFrontalArc);
+    Point pointAverage = calculateAveragePointOfArc(frontalPoints);
+    return pointAverage.distance;
+};
 
 double LidarServer::calculateHeightTriangle(double A, double B, double angle){
     double angleRadiant = angle * (M_PI / 180.0);

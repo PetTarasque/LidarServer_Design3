@@ -16,6 +16,7 @@ private:
     vector<Point> points;
     map<string, double> m_positions;
     pair<int, int> right_arc = {300, 0};
+    pair<int, int> frontal_arc = {265, 275};
 
 public:
     explicit LidarServer(string filePath);
@@ -37,6 +38,7 @@ public:
     static double moduloAngle(double angle);
     static double angleBetweenArcs(pair<double, double> firstArc, pair<double, double> secondArc);
     static double middleOfArc(pair<double, double> arc);
+    double calculateFrontWallDistance(double deviationAngle);
 };
 
 

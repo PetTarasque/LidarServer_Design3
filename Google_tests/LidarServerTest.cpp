@@ -3,17 +3,20 @@
 //
 #include "./lib/googletest/include/gtest/gtest.h"
 #include "LidarServer.h"
+#include <thread>
+#include <chrono>
 
 //Positions of the robot in the sample file
 using namespace std;
 double RIGHT_WALL = 160;//in millimeter
 double FRONT_WALL = 310;
-double LEFT_WALL = 270;
-double REAR_WALL = 530;
+//double LEFT_WALL = 270;
+//double REAR_WALL = 530;
 double ANGLE = 10; //this angle refers to the front of the robot, 10 degrees to the right
-double PRECISION_VALUE = 10.0;
+double PRECISION_VALUE = 5.0;
 double ANGLE_PRECISION = 2.0;
 int NUMBER_OF_ANGLES = 500;
+int EXECUTION_TIME = 1;//in milliseconds
 string FILE_PATH = "../../testData/box.txt";
 
 class LidarServerFixture : public ::testing::Test{
@@ -60,9 +63,7 @@ TEST_F(LidarServerFixture, calculatePositionsUpdatesPositions){
     map<string, double> positions = lidarServer->getPositions();
 
     ASSERT_NE(positions.find("rightWall"), positions.end());
-    ASSERT_NE(positions.find("leftWall"), positions.end());
     ASSERT_NE(positions.find("frontWall"), positions.end());
-    ASSERT_NE(positions.find("rearWall"), positions.end());
     ASSERT_NE(positions.find("angle"), positions.end());
 }
 
@@ -195,11 +196,32 @@ TEST_F(LidarServerFixture, splittingAnAngleInSubIntervals){
 TEST_F(LidarServerFixture, calculateRightWallDistance){
     pair<double, double> rightWallPositions = lidarServer->calculateRightWallPositions();;
     bool isWithinRange = checkIfWithinPrecisionRange(RIGHT_WALL, rightWallPositions.first, PRECISION_VALUE);
-    ASSERT_TRUE(isWithinRange)<<"Expected : " << RIGHT_WALL << "+-"<< PRECISION_VALUE << " Received : "<<rightWallPositions.first<<endl;;
+    ASSERT_TRUE(isWithinRange)<<"Expected : " << RIGHT_WALL << "+-"<< PRECISION_VALUE << " Received : "<<rightWallPositions.first<<endl;
 }
 
 TEST_F(LidarServerFixture, calculateRightWallAngle){
     pair<double, double> rightWallPositions = lidarServer->calculateRightWallPositions();;
     bool isWithinRange = checkIfWithinPrecisionRange(ANGLE, rightWallPositions.second, ANGLE_PRECISION);
-    ASSERT_TRUE(isWithinRange)<<"Expected : " << ANGLE << "+-"<< ANGLE_PRECISION << " Received : "<<rightWallPositions.second<<endl;;
+    ASSERT_TRUE(isWithinRange)<<"Expected : " << ANGLE << "+-"<< ANGLE_PRECISION << " Received : "<<rightWallPositions.second<<endl;
+}
+
+TEST_F(LidarServerFixture, calculateFrontWallDistance){
+    lidarServer->calculatePositions();
+    double distanceFront = lidarServer->getPositions()["frontWall"];
+
+    bool isWithingRange = checkIfWithinPrecisionRange(FRONT_WALL, distanceFront, PRECISION_VALUE);
+    ASSERT_TRUE(isWithingRange) <<"Expected : " << FRONT_WALL << "+-"<< PRECISION_VALUE << " Received : "<<distanceFront<<endl;;
+}
+
+TEST_F(LidarServerFixture, calculatePositionsShouldRunFast){
+    LidarServer* newServer = new LidarServer(FILE_PATH);
+
+    auto start = std::chrono::high_resolution_clock::now();
+    newServer->readLidar();
+    newServer->cleanValues();
+    newServer->calculatePositions();
+
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    EXPECT_LE(duration.count(), EXECUTION_TIME);
 }
