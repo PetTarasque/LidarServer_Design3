@@ -15,7 +15,7 @@ private:
     string m_filePath;
     vector<Point> points;
     map<string, double> m_positions;
-    pair<int, int> right_arc = {330, 30};
+    pair<int, int> right_arc = {300, 0};
 
 public:
     explicit LidarServer(string filePath);
@@ -27,7 +27,7 @@ public:
 
     static double angleOfArc(pair<double, double> arc);
     static pair<double, double> splitArcInSubInterval(pair<double, double> arc, int numberOfSections, int sectionSelected);
-    static double calculateAverageDistance(const std::vector<Point>& points);
+    static Point calculateAveragePointOfArc(const std::vector<Point>& points);
     void readLidar();
     vector<Point> getPoints();
     map<string, double> getPositions();

@@ -84,12 +84,17 @@ void LidarServer::deleteValuesCollidingWithRobot(){
     }), points.end());
 };
 
-double LidarServer::calculateAverageDistance(const std::vector<Point>& points) {
-    double sum = 0.0;
+Point LidarServer::calculateAveragePointOfArc(const std::vector<Point>& points) {
+    double distanceSum = 0.0;
+    double angleSum = 0.0;
     for (const auto& point : points) {
-        sum += point.distance;
+        distanceSum += point.distance;
+        angleSum += point.angle;
     }
-    return points.empty() ? 0.0 : sum / points.size();
+    Point pointAverage{};
+    points.empty() ? pointAverage.angle = 0.0, pointAverage.distance=0.0 :
+            pointAverage.angle = angleSum/points.size(), pointAverage.distance = distanceSum / points.size();
+    return pointAverage;
 }
 
 double LidarServer::angleOfArc(pair<double, double> arc){
@@ -156,23 +161,24 @@ double LidarServer::middleOfArc(pair<double, double> arc){
 };
 
 pair<double, double> LidarServer::calculateRightWallPositions() {
-    //
-    //the logic for calculating arcs should be more generic, and should detect if one of the interval is fucked
-    //
-    //take the front part of the arc? maybe have 3 triangles and verify if 2 are saying the same thing?
-    //also need to take average of angle in the sample sections (and if section hasn't enough points, take another one)
+    /**should have a logic to deal with points that aren't valid.
+     * maybe have 3 triangles taken across the wall and compare them
+     * an arc sample should also verify if there's enough points for the sample, and if not, increase the aperture of the angle
+     * or take another point
+     */
+
     vector<Point> filteredPoint = getPointsInInterval(right_arc);
 
     pair<double, double> samplingForFirstPoint= splitArcInSubInterval(right_arc, 6, 2);
-    double A = calculateAverageDistance(getPointsInInterval(samplingForFirstPoint));
+    Point A = calculateAveragePointOfArc(getPointsInInterval(samplingForFirstPoint));
 
     pair<double, double> samplingForSecondPoint= splitArcInSubInterval(right_arc, 6, 5);
-    double B = calculateAverageDistance(getPointsInInterval(samplingForSecondPoint));
+    Point B = calculateAveragePointOfArc(getPointsInInterval(samplingForSecondPoint));
 
     double Angle = angleBetweenArcs(samplingForFirstPoint, samplingForSecondPoint);
 
-    double triangleHeight = calculateHeightTriangle(A, B, Angle);
-    double deviation = calculateDeviation(A, B, samplingForSecondPoint.second, Angle);
+    double triangleHeight = calculateHeightTriangle(A.distance, B.distance, Angle);
+    double deviation = calculateDeviation(A.distance, B.distance, B.angle, Angle);
 
     return {triangleHeight, deviation};
 }
@@ -190,5 +196,5 @@ double LidarServer::calculateDeviation(double A, double B, double angleB, double
     //we need to multiply by -1, because the Lidar has the positive angle going in a clockwise direction
     double angleFromHeightToB = -1 * atan((A*cos(angleRadiant_AtoB)-B)/(A*sin(angleRadiant_AtoB))) * (180.0/M_PI);
     double deviationAngle = angleFromHeightToB - angleB;
-    return deviationAngle;
+    return moduloAngle(deviationAngle);
 }

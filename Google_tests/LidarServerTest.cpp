@@ -12,6 +12,7 @@ double LEFT_WALL = 270;
 double REAR_WALL = 530;
 double ANGLE = 10; //this angle refers to the front of the robot, 10 degrees to the right
 double PRECISION_VALUE = 10.0;
+double ANGLE_PRECISION = 2.0;
 int NUMBER_OF_ANGLES = 500;
 string FILE_PATH = "../../testData/box.txt";
 
@@ -197,9 +198,8 @@ TEST_F(LidarServerFixture, calculateRightWallDistance){
     ASSERT_TRUE(isWithinRange)<<"Expected : " << RIGHT_WALL << "+-"<< PRECISION_VALUE << " Received : "<<rightWallPositions.first<<endl;;
 }
 
-//TEST_F(LidarServerFixture, calculateRightWallAngle){
-//    this test fails for now, but a physical verification of the angle should be performed before concluding that there's an error in the logic
-//    pair<double, double> rightWallPositions = lidarServer->calculateRightWallPositions();;
-//    bool isWithinRange = checkIfWithinPrecisionRange(ANGLE, rightWallPositions.second, 1);
-//    ASSERT_TRUE(isWithinRange)<<"Expected : " << ANGLE << "+-"<< 1 << " Received : "<<rightWallPositions.second<<endl;;
-//}
+TEST_F(LidarServerFixture, calculateRightWallAngle){
+    pair<double, double> rightWallPositions = lidarServer->calculateRightWallPositions();;
+    bool isWithinRange = checkIfWithinPrecisionRange(ANGLE, rightWallPositions.second, ANGLE_PRECISION);
+    ASSERT_TRUE(isWithinRange)<<"Expected : " << ANGLE << "+-"<< ANGLE_PRECISION << " Received : "<<rightWallPositions.second<<endl;;
+}
