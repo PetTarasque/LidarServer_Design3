@@ -17,6 +17,8 @@ LidarServer::LidarServer(string filePath) : m_filePath { std::move(filePath) }{
 }
 
 void LidarServer::readLidar() {
+    //TODO : this should be changed to use the SDK
+    //TODO : there should still be a test mode that can affect the points himself.
     std::ifstream inFile(m_filePath);
 
     if (!inFile) {
@@ -45,7 +47,7 @@ void LidarServer::calculatePositions() {
     double deviationAngle = rightWallPositions.second;
     positions["rightWall"] = rightWallPositions.first;
     positions["frontWall"] = calculateFrontWallDistance(deviationAngle);
-    //positions["cylinderDistance"] = 7432.4234; ?
+    positions["cylinderDistance"] = 7432.4234;//To actually update
     positions["angle"] = deviationAngle;
     m_positions = positions;
 }
