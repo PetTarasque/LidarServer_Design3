@@ -53,7 +53,6 @@ void LidarServer::calculatePositions() {
 void LidarServer::cleanValues(){
     deleteAbhorrentValues();
     deleteValuesCollidingWithRobot();
-    //should maybe try to delete collisions with other robots part?
 }
 
 void LidarServer::deleteAbhorrentValues(){
