@@ -3,7 +3,7 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "lib/libgtest_main.a"
+			"path" : "lib/libgmock_main.a"
 		}
 	],
 	"backtrace" : 3,
@@ -23,7 +23,7 @@
 		"files" : 
 		[
 			"Google_tests/lib/googletest/cmake/internal_utils.cmake",
-			"Google_tests/lib/googletest/CMakeLists.txt",
+			"Google_tests/lib/googlemock/CMakeLists.txt",
 			"CMakeLists.txt"
 		],
 		"nodes" : 
@@ -34,7 +34,7 @@
 			{
 				"command" : 2,
 				"file" : 1,
-				"line" : 141,
+				"line" : 100,
 				"parent" : 0
 			},
 			{
@@ -52,7 +52,7 @@
 			{
 				"command" : 4,
 				"file" : 1,
-				"line" : 158,
+				"line" : 116,
 				"parent" : 0
 			},
 			{
@@ -64,7 +64,7 @@
 			{
 				"command" : 5,
 				"file" : 1,
-				"line" : 153,
+				"line" : 101,
 				"parent" : 0
 			},
 			{
@@ -73,13 +73,13 @@
 			{
 				"command" : 6,
 				"file" : 2,
-				"line" : 9,
+				"line" : 10,
 				"parent" : 7
 			},
 			{
 				"command" : 6,
 				"file" : 1,
-				"line" : 113,
+				"line" : 75,
 				"parent" : 0
 			},
 			{
@@ -106,7 +106,18 @@
 			[
 				{
 					"backtrace" : 8,
+					"isSystem" : true,
 					"path" : "/Users/hugopj/CLionProjects/lidarServer/lidarServer_lib"
+				},
+				{
+					"backtrace" : 9,
+					"isSystem" : true,
+					"path" : "/Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/googlemock/include"
+				},
+				{
+					"backtrace" : 9,
+					"isSystem" : true,
+					"path" : "/Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/googlemock"
 				},
 				{
 					"backtrace" : 9,
@@ -138,10 +149,14 @@
 	[
 		{
 			"backtrace" : 6,
+			"id" : "gmock::@8e4042a334827d542816"
+		},
+		{
+			"backtrace" : 6,
 			"id" : "gtest::@30f1f5c04acc29f5722e"
 		}
 	],
-	"id" : "gtest_main::@30f1f5c04acc29f5722e",
+	"id" : "gmock_main::@8e4042a334827d542816",
 	"install" : 
 	{
 		"destinations" : 
@@ -156,12 +171,12 @@
 			"path" : "/usr/local"
 		}
 	},
-	"name" : "gtest_main",
-	"nameOnDisk" : "libgtest_main.a",
+	"name" : "gmock_main",
+	"nameOnDisk" : "libgmock_main.a",
 	"paths" : 
 	{
-		"build" : "Google_tests/lib/googletest",
-		"source" : "Google_tests/lib/googletest"
+		"build" : "Google_tests/lib/googlemock",
+		"source" : "Google_tests/lib/googlemock"
 	},
 	"sourceGroups" : 
 	[
@@ -178,7 +193,7 @@
 		{
 			"backtrace" : 3,
 			"compileGroupIndex" : 0,
-			"path" : "Google_tests/lib/googletest/src/gtest_main.cc",
+			"path" : "Google_tests/lib/googlemock/src/gmock_main.cc",
 			"sourceGroupIndex" : 0
 		}
 	],

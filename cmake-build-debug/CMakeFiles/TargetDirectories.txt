@@ -12,6 +12,12 @@
 /Users/hugopj/CLionProjects/lidarServer/cmake-build-debug/lidarServer_lib/CMakeFiles/install.dir
 /Users/hugopj/CLionProjects/lidarServer/cmake-build-debug/lidarServer_lib/CMakeFiles/install/local.dir
 /Users/hugopj/CLionProjects/lidarServer/cmake-build-debug/lidarServer_lib/CMakeFiles/install/strip.dir
+/Users/hugopj/CLionProjects/lidarServer/cmake-build-debug/ldlidar_sdk/CMakeFiles/edit_cache.dir
+/Users/hugopj/CLionProjects/lidarServer/cmake-build-debug/ldlidar_sdk/CMakeFiles/rebuild_cache.dir
+/Users/hugopj/CLionProjects/lidarServer/cmake-build-debug/ldlidar_sdk/CMakeFiles/list_install_components.dir
+/Users/hugopj/CLionProjects/lidarServer/cmake-build-debug/ldlidar_sdk/CMakeFiles/install.dir
+/Users/hugopj/CLionProjects/lidarServer/cmake-build-debug/ldlidar_sdk/CMakeFiles/install/local.dir
+/Users/hugopj/CLionProjects/lidarServer/cmake-build-debug/ldlidar_sdk/CMakeFiles/install/strip.dir
 /Users/hugopj/CLionProjects/lidarServer/cmake-build-debug/Google_tests/CMakeFiles/Google_Tests_run.dir
 /Users/hugopj/CLionProjects/lidarServer/cmake-build-debug/Google_tests/CMakeFiles/edit_cache.dir
 /Users/hugopj/CLionProjects/lidarServer/cmake-build-debug/Google_tests/CMakeFiles/rebuild_cache.dir

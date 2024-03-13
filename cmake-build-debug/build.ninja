@@ -66,7 +66,7 @@ build CMakeFiles/lidarServer_run.dir/main.cpp.o: CXX_COMPILER__lidarServer_run_u
 
 build lidarServer_run: CXX_EXECUTABLE_LINKER__lidarServer_run_Debug CMakeFiles/lidarServer_run.dir/main.cpp.o | lidarServer_lib/liblidarServer_lib.a || lidarServer_lib/liblidarServer_lib.a
   FLAGS = -g -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX13.3.sdk
-  LINK_LIBRARIES = lidarServer_lib/liblidarServer_lib.a
+  LINK_LIBRARIES = lidarServer_lib/liblidarServer_lib.a  -lldlidar_sdk
   OBJECT_DIR = CMakeFiles/lidarServer_run.dir
   POST_BUILD = :
   PRE_LINK = :
@@ -240,6 +240,76 @@ build lidarServer_lib/CMakeFiles/install/strip.util: CUSTOM_COMMAND lidarServer_
   restat = 1
 
 build lidarServer_lib/install/strip: phony lidarServer_lib/CMakeFiles/install/strip.util
+
+# =============================================================================
+# Write statements declared in CMakeLists.txt:
+# /Users/hugopj/CLionProjects/lidarServer/CMakeLists.txt
+# =============================================================================
+
+
+#############################################
+# Utility command for edit_cache
+
+build ldlidar_sdk/CMakeFiles/edit_cache.util: CUSTOM_COMMAND
+  COMMAND = cd /Users/hugopj/CLionProjects/lidarServer/cmake-build-debug/ldlidar_sdk && /Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+  DESC = No interactive CMake dialog available...
+  restat = 1
+
+build ldlidar_sdk/edit_cache: phony ldlidar_sdk/CMakeFiles/edit_cache.util
+
+
+#############################################
+# Utility command for rebuild_cache
+
+build ldlidar_sdk/CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
+  COMMAND = cd /Users/hugopj/CLionProjects/lidarServer/cmake-build-debug/ldlidar_sdk && /Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake --regenerate-during-build -S/Users/hugopj/CLionProjects/lidarServer -B/Users/hugopj/CLionProjects/lidarServer/cmake-build-debug
+  DESC = Running CMake to regenerate build system...
+  pool = console
+  restat = 1
+
+build ldlidar_sdk/rebuild_cache: phony ldlidar_sdk/CMakeFiles/rebuild_cache.util
+
+
+#############################################
+# Utility command for list_install_components
+
+build ldlidar_sdk/list_install_components: phony
+
+
+#############################################
+# Utility command for install
+
+build ldlidar_sdk/CMakeFiles/install.util: CUSTOM_COMMAND ldlidar_sdk/all
+  COMMAND = cd /Users/hugopj/CLionProjects/lidarServer/cmake-build-debug/ldlidar_sdk && /Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -P cmake_install.cmake
+  DESC = Install the project...
+  pool = console
+  restat = 1
+
+build ldlidar_sdk/install: phony ldlidar_sdk/CMakeFiles/install.util
+
+
+#############################################
+# Utility command for install/local
+
+build ldlidar_sdk/CMakeFiles/install/local.util: CUSTOM_COMMAND ldlidar_sdk/all
+  COMMAND = cd /Users/hugopj/CLionProjects/lidarServer/cmake-build-debug/ldlidar_sdk && /Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+  DESC = Installing only the local directory...
+  pool = console
+  restat = 1
+
+build ldlidar_sdk/install/local: phony ldlidar_sdk/CMakeFiles/install/local.util
+
+
+#############################################
+# Utility command for install/strip
+
+build ldlidar_sdk/CMakeFiles/install/strip.util: CUSTOM_COMMAND ldlidar_sdk/all
+  COMMAND = cd /Users/hugopj/CLionProjects/lidarServer/cmake-build-debug/ldlidar_sdk && /Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+  DESC = Installing the project stripped...
+  pool = console
+  restat = 1
+
+build ldlidar_sdk/install/strip: phony ldlidar_sdk/CMakeFiles/install/strip.util
 
 # =============================================================================
 # Write statements declared in CMakeLists.txt:
@@ -719,7 +789,7 @@ build lidarServer_lib: phony lidarServer_lib/liblidarServer_lib.a
 #############################################
 # Folder: /Users/hugopj/CLionProjects/lidarServer/cmake-build-debug
 
-build all: phony lidarServer_run lidarServer_lib/all Google_tests/all
+build all: phony lidarServer_run lidarServer_lib/all ldlidar_sdk/all Google_tests/all
 
 # =============================================================================
 
@@ -752,6 +822,13 @@ build Google_tests/lib/googletest/all: phony lib/libgtest.a lib/libgtest_main.a
 # =============================================================================
 
 #############################################
+# Folder: /Users/hugopj/CLionProjects/lidarServer/cmake-build-debug/ldlidar_sdk
+
+build ldlidar_sdk/all: phony
+
+# =============================================================================
+
+#############################################
 # Folder: /Users/hugopj/CLionProjects/lidarServer/cmake-build-debug/lidarServer_lib
 
 build lidarServer_lib/all: phony lidarServer_lib/liblidarServer_lib.a
@@ -763,14 +840,14 @@ build lidarServer_lib/all: phony lidarServer_lib/liblidarServer_lib.a
 #############################################
 # Re-run CMake if any of its inputs changed.
 
-build build.ninja: RERUN_CMAKE | /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/BasicConfigVersion-AnyNewerVersion.cmake.in /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeCInformation.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeCXXInformation.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeCommonLanguageInclude.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeDependentOption.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeGenericSystem.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeInitializeConfigs.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeLanguageInformation.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakePackageConfigHelpers.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeSystemSpecificInformation.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeSystemSpecificInitialize.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CheckCSourceCompiles.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CheckIncludeFile.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CheckLibraryExists.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Compiler/AppleClang-C.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Compiler/AppleClang-CXX.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Compiler/CMakeCommonCompilerMacros.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Compiler/Clang.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Compiler/GNU.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/FindPackageHandleStandardArgs.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/FindPackageMessage.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/FindThreads.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/GNUInstallDirs.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Internal/CheckSourceCompiles.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Platform/Apple-AppleClang-C.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Platform/Apple-AppleClang-CXX.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Platform/Apple-Clang-C.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Platform/Apple-Clang-CXX.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Platform/Apple-Clang.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Platform/Darwin-Initialize.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Platform/Darwin.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Platform/UnixPaths.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/WriteBasicConfigVersionFile.cmake /Users/hugopj/CLionProjects/lidarServer/CMakeLists.txt /Users/hugopj/CLionProjects/lidarServer/Google_tests/CMakeLists.txt /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/CMakeLists.txt /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/googlemock/CMakeLists.txt /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/googlemock/cmake/gmock.pc.in /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/googlemock/cmake/gmock_main.pc.in /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/googletest/CMakeLists.txt /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/googletest/cmake/Config.cmake.in /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/googletest/cmake/gtest.pc.in /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/googletest/cmake/gtest_main.pc.in /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/googletest/cmake/internal_utils.cmake /Users/hugopj/CLionProjects/lidarServer/lidarServer_lib/CMakeLists.txt CMakeCache.txt CMakeFiles/3.26.4/CMakeCCompiler.cmake CMakeFiles/3.26.4/CMakeCXXCompiler.cmake CMakeFiles/3.26.4/CMakeSystem.cmake
+build build.ninja: RERUN_CMAKE | /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/BasicConfigVersion-AnyNewerVersion.cmake.in /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeCInformation.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeCXXInformation.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeCommonLanguageInclude.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeDependentOption.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeGenericSystem.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeInitializeConfigs.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeLanguageInformation.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakePackageConfigHelpers.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeSystemSpecificInformation.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeSystemSpecificInitialize.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CheckCSourceCompiles.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CheckIncludeFile.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CheckLibraryExists.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Compiler/AppleClang-C.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Compiler/AppleClang-CXX.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Compiler/CMakeCommonCompilerMacros.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Compiler/Clang.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Compiler/GNU.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/FindPackageHandleStandardArgs.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/FindPackageMessage.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/FindThreads.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/GNUInstallDirs.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Internal/CheckSourceCompiles.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Platform/Apple-AppleClang-C.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Platform/Apple-AppleClang-CXX.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Platform/Apple-Clang-C.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Platform/Apple-Clang-CXX.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Platform/Apple-Clang.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Platform/Darwin-Initialize.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Platform/Darwin.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Platform/UnixPaths.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/WriteBasicConfigVersionFile.cmake /Users/hugopj/CLionProjects/lidarServer/CMakeLists.txt /Users/hugopj/CLionProjects/lidarServer/Google_tests/CMakeLists.txt /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/CMakeLists.txt /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/googlemock/CMakeLists.txt /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/googlemock/cmake/gmock.pc.in /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/googlemock/cmake/gmock_main.pc.in /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/googletest/CMakeLists.txt /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/googletest/cmake/Config.cmake.in /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/googletest/cmake/gtest.pc.in /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/googletest/cmake/gtest_main.pc.in /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/googletest/cmake/internal_utils.cmake /Users/hugopj/CLionProjects/lidarServer/ldlidar_sdk/CMakeLists.txt /Users/hugopj/CLionProjects/lidarServer/lidarServer_lib/CMakeLists.txt CMakeCache.txt CMakeFiles/3.26.4/CMakeCCompiler.cmake CMakeFiles/3.26.4/CMakeCXXCompiler.cmake CMakeFiles/3.26.4/CMakeSystem.cmake
   pool = console
 
 
 #############################################
 # A missing CMake input file is not an error.
 
-build /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/BasicConfigVersion-AnyNewerVersion.cmake.in /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeCInformation.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeCXXInformation.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeCommonLanguageInclude.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeDependentOption.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeGenericSystem.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeInitializeConfigs.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeLanguageInformation.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakePackageConfigHelpers.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeSystemSpecificInformation.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeSystemSpecificInitialize.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CheckCSourceCompiles.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CheckIncludeFile.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CheckLibraryExists.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Compiler/AppleClang-C.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Compiler/AppleClang-CXX.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Compiler/CMakeCommonCompilerMacros.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Compiler/Clang.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Compiler/GNU.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/FindPackageHandleStandardArgs.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/FindPackageMessage.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/FindThreads.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/GNUInstallDirs.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Internal/CheckSourceCompiles.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Platform/Apple-AppleClang-C.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Platform/Apple-AppleClang-CXX.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Platform/Apple-Clang-C.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Platform/Apple-Clang-CXX.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Platform/Apple-Clang.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Platform/Darwin-Initialize.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Platform/Darwin.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Platform/UnixPaths.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/WriteBasicConfigVersionFile.cmake /Users/hugopj/CLionProjects/lidarServer/CMakeLists.txt /Users/hugopj/CLionProjects/lidarServer/Google_tests/CMakeLists.txt /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/CMakeLists.txt /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/googlemock/CMakeLists.txt /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/googlemock/cmake/gmock.pc.in /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/googlemock/cmake/gmock_main.pc.in /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/googletest/CMakeLists.txt /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/googletest/cmake/Config.cmake.in /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/googletest/cmake/gtest.pc.in /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/googletest/cmake/gtest_main.pc.in /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/googletest/cmake/internal_utils.cmake /Users/hugopj/CLionProjects/lidarServer/lidarServer_lib/CMakeLists.txt CMakeCache.txt CMakeFiles/3.26.4/CMakeCCompiler.cmake CMakeFiles/3.26.4/CMakeCXXCompiler.cmake CMakeFiles/3.26.4/CMakeSystem.cmake: phony
+build /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/BasicConfigVersion-AnyNewerVersion.cmake.in /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeCInformation.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeCXXInformation.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeCommonLanguageInclude.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeDependentOption.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeGenericSystem.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeInitializeConfigs.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeLanguageInformation.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakePackageConfigHelpers.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeSystemSpecificInformation.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CMakeSystemSpecificInitialize.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CheckCSourceCompiles.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CheckIncludeFile.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/CheckLibraryExists.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Compiler/AppleClang-C.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Compiler/AppleClang-CXX.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Compiler/CMakeCommonCompilerMacros.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Compiler/Clang.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Compiler/GNU.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/FindPackageHandleStandardArgs.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/FindPackageMessage.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/FindThreads.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/GNUInstallDirs.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Internal/CheckSourceCompiles.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Platform/Apple-AppleClang-C.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Platform/Apple-AppleClang-CXX.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Platform/Apple-Clang-C.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Platform/Apple-Clang-CXX.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Platform/Apple-Clang.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Platform/Darwin-Initialize.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Platform/Darwin.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/Platform/UnixPaths.cmake /Applications/CLion.app/Contents/bin/cmake/mac/share/cmake-3.26/Modules/WriteBasicConfigVersionFile.cmake /Users/hugopj/CLionProjects/lidarServer/CMakeLists.txt /Users/hugopj/CLionProjects/lidarServer/Google_tests/CMakeLists.txt /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/CMakeLists.txt /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/googlemock/CMakeLists.txt /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/googlemock/cmake/gmock.pc.in /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/googlemock/cmake/gmock_main.pc.in /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/googletest/CMakeLists.txt /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/googletest/cmake/Config.cmake.in /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/googletest/cmake/gtest.pc.in /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/googletest/cmake/gtest_main.pc.in /Users/hugopj/CLionProjects/lidarServer/Google_tests/lib/googletest/cmake/internal_utils.cmake /Users/hugopj/CLionProjects/lidarServer/ldlidar_sdk/CMakeLists.txt /Users/hugopj/CLionProjects/lidarServer/lidarServer_lib/CMakeLists.txt CMakeCache.txt CMakeFiles/3.26.4/CMakeCCompiler.cmake CMakeFiles/3.26.4/CMakeCXXCompiler.cmake CMakeFiles/3.26.4/CMakeSystem.cmake: phony
 
 
 #############################################

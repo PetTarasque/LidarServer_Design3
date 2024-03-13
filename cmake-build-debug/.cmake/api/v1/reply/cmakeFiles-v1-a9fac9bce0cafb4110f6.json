@@ -150,6 +150,9 @@
 			"path" : "lidarServer_lib/CMakeLists.txt"
 		},
 		{
+			"path" : "ldlidar_sdk/CMakeLists.txt"
+		},
+		{
 			"path" : "Google_tests/CMakeLists.txt"
 		},
 		{
