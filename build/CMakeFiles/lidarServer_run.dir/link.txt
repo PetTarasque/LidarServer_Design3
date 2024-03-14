@@ -1,0 +1,1 @@
+/usr/bin/c++  -g   CMakeFiles/lidarServer_run.dir/main.cpp.o  -o lidarServer_run  lidarServer_lib/liblidarServer_lib.a 

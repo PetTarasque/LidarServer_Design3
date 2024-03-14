@@ -1,0 +1,2 @@
+/usr/bin/ar qc liblidarServer_lib.a  CMakeFiles/lidarServer_lib.dir/LidarServer.cpp.o
+/usr/bin/ranlib liblidarServer_lib.a

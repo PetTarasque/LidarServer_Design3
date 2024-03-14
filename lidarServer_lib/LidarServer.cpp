@@ -7,6 +7,8 @@
 #include <vector>
 #include <utility>
 #include <map>
+#include <algorithm>
+#include <cmath>
 
 #include "LidarServer.h"
 
@@ -136,8 +138,12 @@ double LidarServer::moduloAngle(double angle){
 
 pair<double, double> LidarServer::splitArcInSubInterval(pair<double, double> arc, int numberOfSections, int sectionSelected){
     //this function splits an angle in sections and returns the arc of that subsection
-    int sectionSelectedAdjusted = clamp(sectionSelected, 1, 6); //ensure the section selected is within acceptable values
-    if(sectionSelectedAdjusted != sectionSelected){
+    //ensure the section selected is within acceptable values
+    if(sectionSelected > numberOfSections){
+        sectionSelected = numberOfSections;
+        cerr << "The given sectionSelected was invalid : " <<sectionSelected<<endl;
+    } else if (sectionSelected < 1){
+        sectionSelected = 1;
         cerr << "The given sectionSelected was invalid : " <<sectionSelected<<endl;
     }
     double sizeOfSections = angleOfArc(arc)/numberOfSections;

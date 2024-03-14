@@ -1,0 +1,34 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/team0/Documents/LidarServer_Design3/lidarServer_lib/LidarServer.cpp
+iostream
+-
+fstream
+-
+vector
+-
+utility
+-
+map
+-
+algorithm
+-
+cmath
+-
+LidarServer.h
+/home/team0/Documents/LidarServer_Design3/lidarServer_lib/LidarServer.h
+
+/home/team0/Documents/LidarServer_Design3/lidarServer_lib/LidarServer.h
+iostream
+-
+Point.h
+/home/team0/Documents/LidarServer_Design3/lidarServer_lib/Point.h
+
+/home/team0/Documents/LidarServer_Design3/lidarServer_lib/Point.h
+
