@@ -1,1 +1,0 @@
-/usr/bin/c++  -g   CMakeFiles/Google_Tests_run.dir/LidarServerTest.cpp.o  -o Google_Tests_run  ../lidarServer_lib/liblidarServer_lib.a ../lib/libgtest.a ../lib/libgtest_main.a ../lib/libgtest.a -lpthread 

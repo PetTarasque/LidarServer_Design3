@@ -2,6 +2,8 @@
 #include <fstream>
 #include <vector>
 #include "Point.h"
+#include "ldlidar_driver/ldlidar_driver_linux.h"
+#include "ldlidar_driver/ldlidar_datatype.h"
 
 //#include "include/ldlidar_driver/ldlidar_driver_linux.h"
 
@@ -44,14 +46,12 @@ std::vector<Point> loadData(const std::string& filename) {
     return points;
 }
 
-// struct LdsInfoStruct {
-//     std::string ldtype_str;
-//     ldlidar::LDType ldtype_enum;
-//     uint32_t baudrate;
-// };
+
 
 int main() {
     std::cout << "Helo world!" << std::endl;
+    ldlidar::LidarStatus status = ldlidar::LidarStatus::NORMAL;
+    std::cout << "No bugs!" << std::endl;
     return 0;
 }
 
