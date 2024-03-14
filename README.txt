@@ -1,0 +1,1 @@
+execute ./run.sh in root for build and run
