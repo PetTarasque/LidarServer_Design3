@@ -4,6 +4,8 @@
 #include "./lib/googletest/include/gtest/gtest.h"
 #include "LidarServer.h"
 #include <thread>
+#include <iostream>
+#include <fstream>
 #include <chrono>
 
 //Positions of the robot in the sample file
@@ -18,21 +20,39 @@ double ANGLE_PRECISION = 2.0;
 int NUMBER_OF_ANGLES = 500;
 int EXECUTION_TIME = 1;//in milliseconds
 string FILE_PATH = "../../testData/box.txt";
+vector<Point> points;
+
+vector<Point> readLidar() {
+    std::ifstream inFile(FILE_PATH);
+
+    if (!inFile) {
+        std::cerr << "Error: Couldn't open file " << FILE_PATH<< " for reading\n";
+    }
+    points.clear();
+    Point point;
+    while (inFile >> point.angle >> point.distance) {
+        points.push_back(point);
+    }
+
+    inFile.close();
+    return points;
+};
+
 
 class LidarServerFixture : public ::testing::Test{
 protected:
     virtual void SetUp()
     {
-        lidarServer = new LidarServer(FILE_PATH);
-        lidarServer->readLidar();
-        lidarServer->cleanValues();
+        lidarServer = new LidarServer();
+        vector<Point> points = readLidar();
+        lidarServer->updatePoints(points);
     }
 
     virtual void TearDown() {
         delete lidarServer;
     }
 
-    LidarServer* lidarServer;
+    LidarServer* lidarServer{};
 };
 
 bool checkIfWithinPrecisionRange(double referenceValue, double returnedValue, double precision){
@@ -52,15 +72,17 @@ TEST_F(LidarServerFixture, readLidarFetchesValues){
 }
 
 TEST_F(LidarServerFixture, readLidarReturnsAllAngles){
-    LidarServer* serverNotCleaned = new LidarServer(FILE_PATH);
-    serverNotCleaned->readLidar();
+    LidarServer* serverNotCleaned = new LidarServer();
+    vector<Point> points = readLidar();
+    serverNotCleaned->updatePoints(points);
+
     vector<Point> returnedPoints = serverNotCleaned->getPoints();
+
     ASSERT_EQ(NUMBER_OF_ANGLES, returnedPoints.size());
 }
 
 TEST_F(LidarServerFixture, calculatePositionsUpdatesPositions){
-    lidarServer->calculatePositions();
-    map<string, double> positions = lidarServer->getPositions();
+    map<string, double> positions = lidarServer->detectObstacles();
 
     ASSERT_NE(positions.find("rightWall"), positions.end());
     ASSERT_NE(positions.find("frontWall"), positions.end());
@@ -68,14 +90,18 @@ TEST_F(LidarServerFixture, calculatePositionsUpdatesPositions){
 }
 
 TEST_F(LidarServerFixture, cleanValuesEliminatesSomePoints){
-    LidarServer* serverNotCleaned = new LidarServer(FILE_PATH);
-    serverNotCleaned->readLidar();
+    LidarServer* serverNotCleaned = new LidarServer();
+    vector<Point> points = readLidar();
+    lidarServer->updatePoints(points);
+
     serverNotCleaned->cleanValues();
+
     vector<Point> returnedPoints = serverNotCleaned->getPoints();
     ASSERT_TRUE(NUMBER_OF_ANGLES >= returnedPoints.size());
 }
 
 TEST_F(LidarServerFixture, cleanPointCollidingWithRobot){
+    lidarServer->cleanValues();
     vector<Point> returnedPoints = lidarServer->getPoints();
     ASSERT_FALSE(containsAngle(returnedPoints, 125));
 }
@@ -206,20 +232,19 @@ TEST_F(LidarServerFixture, calculateRightWallAngle){
 }
 
 TEST_F(LidarServerFixture, calculateFrontWallDistance){
-    lidarServer->calculatePositions();
-    double distanceFront = lidarServer->getPositions()["frontWall"];
+    double distanceFront = lidarServer->detectObstacles()["frontWall"];
 
     bool isWithingRange = checkIfWithinPrecisionRange(FRONT_WALL, distanceFront, PRECISION_VALUE);
     ASSERT_TRUE(isWithingRange) <<"Expected : " << FRONT_WALL << "+-"<< PRECISION_VALUE << " Received : "<<distanceFront<<endl;;
 }
 
 TEST_F(LidarServerFixture, calculatePositionsShouldRunFast){
-    LidarServer* newServer = new LidarServer(FILE_PATH);
+    LidarServer* newServer = new LidarServer();
 
     auto start = std::chrono::high_resolution_clock::now();
-    newServer->readLidar();
-    newServer->cleanValues();
-    newServer->calculatePositions();
+    vector<Point> points = readLidar();
+    newServer->updatePoints(points);
+    newServer->detectObstacles();
 
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);

@@ -2003,7 +2003,7 @@ using SignatureOfT = typename SignatureOf<F>::type;
 // The expectation spec says that the first Bar("a") must happen
 // before check point "1", the second Bar("a") must happen after check
 // point "2", and nothing should happen between the two check
-// points. The explicit check points make it easy to tell which
+// m_points. The explicit check m_points make it easy to tell which
 // Bar("a") is called by which call to Foo().
 //
 // MockFunction<F> can also be used to exercise code that accepts

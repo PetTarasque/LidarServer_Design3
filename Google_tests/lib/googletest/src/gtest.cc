@@ -2067,11 +2067,11 @@ inline uint32_t CreateCodePointFromUtf16SurrogatePair(wchar_t first,
 // The wide string is assumed to have the following encoding:
 //   UTF-16 if sizeof(wchar_t) == 2 (on Windows, Cygwin)
 //   UTF-32 if sizeof(wchar_t) == 4 (on Linux)
-// Parameter str points to a null-terminated wide string.
+// Parameter str m_points to a null-terminated wide string.
 // Parameter num_chars may additionally limit the number
 // of wchar_t characters processed. -1 is used when the entire string
 // should be processed.
-// If the string contains code points that are not valid Unicode code points
+// If the string contains code m_points that are not valid Unicode code m_points
 // (i.e. outside of Unicode range U+0 to U+10FFFF) they will be output
 // as '(Invalid Unicode 0xXXXXXXXX)'. If the string is in UTF16 encoding
 // and contains invalid UTF-16 surrogate pairs, values in those pairs
@@ -6584,7 +6584,7 @@ static const char kColorEncodedHelpMessage[] =
 #endif  // GTEST_HAS_DEATH_TEST && !GTEST_OS_WINDOWS
     "  @G--" GTEST_FLAG_PREFIX_
     "break_on_failure@D\n"
-    "      Turn assertion failures into debugger break-points.\n"
+    "      Turn assertion failures into debugger break-m_points.\n"
     "  @G--" GTEST_FLAG_PREFIX_
     "throw_on_failure@D\n"
     "      Turn assertion failures into C++ exceptions for use by an external\n"

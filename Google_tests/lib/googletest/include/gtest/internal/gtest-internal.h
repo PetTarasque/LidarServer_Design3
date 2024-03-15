@@ -218,7 +218,7 @@ GTEST_API_ std::string GetBoolAssertionFailureMessage(
 //
 // The purpose of this class is to do more sophisticated number
 // comparison.  (Due to round-off error, etc, it's very unlikely that
-// two floating-points will be equal exactly.  Hence a naive
+// two floating-m_points will be equal exactly.  Hence a naive
 // comparison by the == operation often doesn't work.)
 //
 // Format of IEEE floating-point:

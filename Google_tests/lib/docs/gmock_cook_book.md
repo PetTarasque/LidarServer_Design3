@@ -1270,7 +1270,7 @@ the pointer itself, has a certain property? Well, you can use the `Pointee(m)`
 matcher.
 
 `Pointee(m)` matches a pointer if and only if `m` matches the value the pointer
-points to. For example:
+m_points to. For example:
 
 ```cpp
 using ::testing::Ge;
@@ -1279,7 +1279,7 @@ using ::testing::Pointee;
   EXPECT_CALL(foo, Bar(Pointee(Ge(3))));
 ```
 
-expects `foo.Bar()` to be called with a pointer that points to a value greater
+expects `foo.Bar()` to be called with a pointer that m_points to a value greater
 than or equal to 3.
 
 One nice thing about `Pointee()` is that it treats a `NULL` pointer as a match
@@ -1300,7 +1300,7 @@ smart pointers (`std::unique_ptr`, `std::shared_ptr`, etc)?
 
 What if you have a pointer to pointer? You guessed it - you can use nested
 `Pointee()` to probe deeper inside the value. For example,
-`Pointee(Pointee(Lt(3)))` matches a pointer that points to a pointer that points
+`Pointee(Pointee(Lt(3)))` matches a pointer that m_points to a pointer that m_points
 to a number less than 3 (what a mouthful...).
 
 ### Defining a Custom Matcher Class {#CustomMatcherClass}

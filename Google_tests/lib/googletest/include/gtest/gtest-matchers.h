@@ -144,7 +144,7 @@ class MatcherInterface : public MatcherDescriberInterface {
   // the form of a non-restrictive relative clause ("which ...",
   // "whose ...", etc) that describes x.  For example, the
   // MatchAndExplain() method of the Pointee(...) matcher should
-  // generate an explanation like "which points to ...".
+  // generate an explanation like "which m_points to ...".
   //
   // Implementations of MatchAndExplain() should add an explanation of
   // the match result *if and only if* they can provide additional

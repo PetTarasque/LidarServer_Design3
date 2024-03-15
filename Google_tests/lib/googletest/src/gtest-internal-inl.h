@@ -228,11 +228,11 @@ GTEST_API_ std::string CodePointToUtf8(uint32_t code_point);
 // The wide string is assumed to have the following encoding:
 //   UTF-16 if sizeof(wchar_t) == 2 (on Windows, Cygwin)
 //   UTF-32 if sizeof(wchar_t) == 4 (on Linux)
-// Parameter str points to a null-terminated wide string.
+// Parameter str m_points to a null-terminated wide string.
 // Parameter num_chars may additionally limit the number
 // of wchar_t characters processed. -1 is used when the entire string
 // should be processed.
-// If the string contains code points that are not valid Unicode code points
+// If the string contains code m_points that are not valid Unicode code m_points
 // (i.e. outside of Unicode range U+0 to U+10FFFF) they will be output
 // as '(Invalid Unicode 0xXXXXXXXX)'. If the string is in UTF16 encoding
 // and contains invalid UTF-16 surrogate pairs, values in those pairs
@@ -895,13 +895,13 @@ class GTEST_API_ UnitTestImpl {
   // Index of the last death test suite registered.  Initially -1.
   int last_death_test_suite_;
 
-  // This points to the TestSuite for the currently running test.  It
+  // This m_points to the TestSuite for the currently running test.  It
   // changes as Google Test goes through one test suite after another.
   // When no test is running, this is set to NULL and Google Test
   // stores assertion results in ad_hoc_test_result_.  Initially NULL.
   TestSuite* current_test_suite_;
 
-  // This points to the TestInfo for the currently running test.  It
+  // This m_points to the TestInfo for the currently running test.  It
   // changes as Google Test goes through one test after another.  When
   // no test is running, this is set to NULL and Google Test stores
   // assertion results in ad_hoc_test_result_.  Initially NULL.

@@ -2008,7 +2008,7 @@ namespace posix {
 // File system porting.
 // Note: Not every I/O-related function is related to file systems, so don't
 // just disable all of them here. For example, fileno() and isatty(), etc. must
-// always be available in order to detect if a pipe points to a terminal.
+// always be available in order to detect if a pipe m_points to a terminal.
 #ifdef GTEST_OS_WINDOWS
 
 typedef struct _stat StatStruct;

@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <utility>
 #include <vector>
 #include <utility>
 #include <map>
@@ -13,35 +14,21 @@
 
 using namespace std;
 
-LidarServer::LidarServer(string filePath) : m_filePath { std::move(filePath) }{
+
+void LidarServer::updatePoints(vector<Point> points){
+    m_points = std::move(points);;
 }
 
-void LidarServer::readLidar() {
-    //TODO : this should be changed to use the SDK
-    //TODO : there should still be a test mode that can affect the points himself.
-    std::ifstream inFile(m_filePath);
-
-    if (!inFile) {
-        std::cerr << "Error: Couldn't open file " << m_filePath<< " for reading\n";
-    }
-
-    Point point;
-    while (inFile >> point.angle >> point.distance) {
-        points.push_back(point);
-    }
-
-    inFile.close();
-};
-
-map<string, double> LidarServer::getPositions(){
-    return m_positions;
-};
+map<string, double> LidarServer::detectObstacles(){
+    cleanValues();
+    return calculatePositions();
+}
 
 vector<Point> LidarServer::getPoints(){
-    return points;
+    return m_points;
 };
 
-void LidarServer::calculatePositions() {
+map<string, double> LidarServer::calculatePositions() {
     map<string, double> positions;
     pair<double, double> rightWallPositions = calculateRightWallPositions();
     double deviationAngle = rightWallPositions.second;
@@ -49,7 +36,7 @@ void LidarServer::calculatePositions() {
     positions["frontWall"] = calculateFrontWallDistance(deviationAngle);
     positions["cylinderDistance"] = 7432.4234;//To actually update
     positions["angle"] = deviationAngle;
-    m_positions = positions;
+    return positions;
 }
 
 void LidarServer::cleanValues(){
@@ -58,20 +45,20 @@ void LidarServer::cleanValues(){
 }
 
 void LidarServer::deleteAbhorrentValues(){
-    //this deletes the points that are below 4 cm, as they are for sure irrelevant
-    points.erase(std::remove_if(points.begin(), points.end(), [&](const Point& point) {
+    //this deletes the m_points that are below 4 cm, as they are for sure irrelevant
+    m_points.erase(std::remove_if(m_points.begin(), m_points.end(), [&](const Point& point) {
         if (point.distance < 10){
             return true;
         }
         return false;
-    }), points.end());
+    }), m_points.end());
 };
 
 void LidarServer::deleteValuesCollidingWithRobot(){
     //<angleIntervalStart, angleIntervalEnd, minimumDistance>
     vector<tuple<double, double, int>> AnglesIntervals = {{15, 25, 60}, {48, 58, 120}, {122, 131, 120}, {175,185, 60}};
 
-    points.erase(std::remove_if(points.begin(), points.end(), [&](const Point& point) {
+    m_points.erase(std::remove_if(m_points.begin(), m_points.end(), [&](const Point& point) {
         for (const auto& rangeAndDist : AnglesIntervals) {
             double minAngle = get<0>(rangeAndDist);
             double maxAngle = get<1>(rangeAndDist);
@@ -81,7 +68,7 @@ void LidarServer::deleteValuesCollidingWithRobot(){
             }
         }
         return false;
-    }), points.end());
+    }), m_points.end());
 };
 
 Point LidarServer::calculateAveragePointOfArc(const std::vector<Point>& points) {
@@ -115,10 +102,10 @@ vector<Point> LidarServer::getPointsInInterval(pair<int, int> arc){
     int endInterval = arc.second;
     if(startInterval > endInterval){
         //This distinction is necessary if for example the start of the interval is 345 and the end is 15
-        copy_if(points.begin(), points.end(), std::back_inserter(pointsOfInterval),
-                     [&startInterval, &endInterval](const Point& point) { return point.angle >= startInterval || point.angle <= endInterval;});
+        copy_if(m_points.begin(), m_points.end(), std::back_inserter(pointsOfInterval),
+                [&startInterval, &endInterval](const Point& point) { return point.angle >= startInterval || point.angle <= endInterval;});
     } else {
-        copy_if(points.begin(), points.end(), std::back_inserter(pointsOfInterval),
+        copy_if(m_points.begin(), m_points.end(), std::back_inserter(pointsOfInterval),
                 [&startInterval, &endInterval](const Point& point) { return point.angle >= startInterval && point.angle <= endInterval;});
     }
     return pointsOfInterval;
@@ -162,9 +149,9 @@ double LidarServer::middleOfArc(pair<double, double> arc){
 
 pair<double, double> LidarServer::calculateRightWallPositions() {
     /** TODO
-     * should have a logic to deal with points that aren't valid.
+     * should have a logic to deal with m_points that aren't valid.
      * maybe have 3 triangles taken across the wall and compare them
-     * an arc sample should also verify if there's enough points for the sample, and if not, increase the aperture of the angle
+     * an arc sample should also verify if there's enough m_points for the sample, and if not, increase the aperture of the angle
      * or take another point
      */
 

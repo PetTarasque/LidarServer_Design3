@@ -628,7 +628,7 @@ bool DeathTestImpl::Passed(bool status_ok) {
 }
 
 #ifndef GTEST_OS_WINDOWS
-// Note: The return value points into args, so the return value's lifetime is
+// Note: The return value m_points into args, so the return value's lifetime is
 // bound to that of args.
 static std::vector<char*> CreateArgvFromArgs(std::vector<std::string>& args) {
   std::vector<char*> result;

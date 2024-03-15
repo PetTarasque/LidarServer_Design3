@@ -1571,7 +1571,7 @@ GTEST_API_ AssertionResult IsNotSubstring(const char* needle_expr,
 
 namespace internal {
 
-// Helper template function for comparing floating-points.
+// Helper template function for comparing floating-m_points.
 //
 // Template parameter:
 //

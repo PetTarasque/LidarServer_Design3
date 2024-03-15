@@ -57,7 +57,7 @@
 //
 // To aid debugging: when T is a reference type, the address of the
 // value is also printed; when T is a (const) char pointer, both the
-// pointer value and the NUL-terminated string it points to are
+// pointer value and the NUL-terminated string it m_points to are
 // printed.
 //
 // We also provide some convenient wrappers:

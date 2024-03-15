@@ -12,26 +12,25 @@ using namespace std;
 
 class LidarServer {
 private:
-    string m_filePath;
-    vector<Point> points;
-    map<string, double> m_positions;
+    vector<Point> m_points;
     pair<int, int> right_arc = {300, 0};
     pair<int, int> frontal_arc = {265, 275};
 
 public:
-    explicit LidarServer(string filePath);
-    void calculatePositions();
+    map<string, double> detectObstacles();
+    void updatePoints(vector<Point> points);
+
+    //don't touch the following functions
     void cleanValues();
     void deleteValuesCollidingWithRobot();
     void deleteAbhorrentValues();
     pair<double, double> calculateRightWallPositions();
+    map<string, double> calculatePositions();
 
     static double angleOfArc(pair<double, double> arc);
     static pair<double, double> splitArcInSubInterval(pair<double, double> arc, int numberOfSections, int sectionSelected);
     static Point calculateAveragePointOfArc(const std::vector<Point>& points);
-    void readLidar();
     vector<Point> getPoints();
-    map<string, double> getPositions();
     vector<Point> getPointsInInterval(pair<int, int> arc);
     static double calculateHeightTriangle(double A, double B, double angle);
     static double calculateDeviation(double A, double B, double angleB, double angle);
