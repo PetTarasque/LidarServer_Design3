@@ -2,7 +2,10 @@
 #include <fstream>
 #include <vector>
 #include "Point.h"
-#include "include/ldlidar_driver/ldlidar_driver_linux.h"
+#include "ldlidar_driver/ldlidar_driver_linux.h"
+#include "ldlidar_driver/ldlidar_datatype.h"
+
+//#include "include/ldlidar_driver/ldlidar_driver_linux.h"
 
 void saveData(const std::vector<Point>& points, const std::string& filename, const std::vector<std::string>& additionalLines) {
     std::ofstream outFile(filename);
@@ -43,13 +46,12 @@ std::vector<Point> loadData(const std::string& filename) {
     return points;
 }
 
-struct LdsInfoStruct {
-    std::string ldtype_str;
-    ldlidar::LDType ldtype_enum;
-    uint32_t baudrate;
-};
+
 
 int main() {
+    std::cout << "Helo world!" << std::endl;
+    ldlidar::LidarStatus status = ldlidar::LidarStatus::NORMAL;
+    std::cout << "No bugs!" << std::endl;
     return 0;
 }
 
@@ -57,7 +59,7 @@ int main() {
    while (false) {
        std::vector<Point> points = {{3.0, 45.0},
                                     {5.0, 60.0},
-                                    {7.0, 90.0}};
+                                    {7.0, 90.0}
        const std::string path = "../testData/";
        std::cout << "----------------- "<<std::endl;
        std::cout << "Enter the name of the file: ";
