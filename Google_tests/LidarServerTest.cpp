@@ -1,7 +1,6 @@
 //
 // Created by Hugo PJ on 2024-03-05.
 //
-//#include "./lib/googletest/include/gtest/gtest.h"
 #include "gtest/gtest.h"
 #include "LidarServer.h"
 #include <thread>
@@ -14,8 +13,6 @@
 using namespace std;
 double RIGHT_WALL = 160;//in millimeter
 double FRONT_WALL = 310;
-//double LEFT_WALL = 270;
-//double REAR_WALL = 530;
 double ANGLE = 10; //this angle refers to the front of the robot, 10 degrees to the right
 double PRECISION_VALUE = 5.0;
 double ANGLE_PRECISION = 2.0;
@@ -24,11 +21,11 @@ int EXECUTION_TIME = 1;//in milliseconds
 string FILE_PATH = "../../testData/box.txt";
 vector<Point> points;
 
-vector<Point> readLidar() {
-    std::ifstream inFile(FILE_PATH);
+vector<Point> readLidar(string path) {
+    std::ifstream inFile(path);
 
     if (!inFile) {
-        std::cerr << "Error: Couldn't open file " << FILE_PATH<< " for reading\n";
+        std::cerr << "Error: Couldn't open file " << path<< " for reading\n";
     }
     points.clear();
     Point point;
@@ -46,7 +43,7 @@ protected:
     virtual void SetUp()
     {
         lidarServer = new LidarServer();
-        vector<Point> points = readLidar();
+        vector<Point> points = readLidar(FILE_PATH);
         lidarServer->updatePoints(points);
     }
 
@@ -75,7 +72,7 @@ TEST_F(LidarServerFixture, readLidarFetchesValues){
 
 TEST_F(LidarServerFixture, readLidarReturnsAllAngles){
     LidarServer* serverNotCleaned = new LidarServer();
-    vector<Point> points = readLidar();
+    vector<Point> points = readLidar(FILE_PATH);
     serverNotCleaned->updatePoints(points);
 
     vector<Point> returnedPoints = serverNotCleaned->getPoints();
@@ -93,7 +90,7 @@ TEST_F(LidarServerFixture, calculatePositionsUpdatesPositions){
 
 TEST_F(LidarServerFixture, cleanValuesEliminatesSomePoints){
     LidarServer* serverNotCleaned = new LidarServer();
-    vector<Point> points = readLidar();
+    vector<Point> points = readLidar(FILE_PATH);
     lidarServer->updatePoints(points);
 
     serverNotCleaned->cleanValues();
@@ -244,7 +241,7 @@ TEST_F(LidarServerFixture, calculatePositionsShouldRunFast){
     LidarServer* newServer = new LidarServer();
 
     auto start = std::chrono::high_resolution_clock::now();
-    vector<Point> points = readLidar();
+    vector<Point> points = readLidar(FILE_PATH);
     newServer->updatePoints(points);
     newServer->detectObstacles();
 
