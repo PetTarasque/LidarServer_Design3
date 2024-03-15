@@ -1,12 +1,14 @@
 //
 // Created by Hugo PJ on 2024-03-05.
 //
-#include "./lib/googletest/include/gtest/gtest.h"
+//#include "./lib/googletest/include/gtest/gtest.h"
+#include "gtest/gtest.h"
 #include "LidarServer.h"
 #include <thread>
 #include <iostream>
 #include <fstream>
 #include <chrono>
+#include <algorithm>
 
 //Positions of the robot in the sample file
 using namespace std;
