@@ -7,6 +7,8 @@
 
 #include <iostream>
 #include "Point.h"
+#include <map>
+#include <vector>
 
 using namespace std;
 

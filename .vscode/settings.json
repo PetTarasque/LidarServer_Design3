@@ -1,6 +1,7 @@
 {
     "files.associations": {
-        "iostream": "cpp",
+        "*.cpp": "cpp",
+        "fstream": "cpp",
         "any": "cpp",
         "array": "cpp",
         "atomic": "cpp",
@@ -45,10 +46,10 @@
         "tuple": "cpp",
         "type_traits": "cpp",
         "utility": "cpp",
-        "fstream": "cpp",
         "initializer_list": "cpp",
         "iomanip": "cpp",
         "iosfwd": "cpp",
+        "iostream": "cpp",
         "istream": "cpp",
         "limits": "cpp",
         "mutex": "cpp",
