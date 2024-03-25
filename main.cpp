@@ -12,18 +12,39 @@
 #include <iostream>
 #include <fstream>
 
+using namespace std;
 
-// int main(){
-//     LidarServer* lidarServer = new LidarServer();
-//     Point point;
-//     point.angle = 80.00;
-//     point.distance = 20.00;
-//     std::cout << point.angle << " " << point.distance<< std::endl;
-//     ldlidar::Points2D laser_scan_points;
-//     return 0;
-// }
+void saveData(const std::vector<Point>& points, const std::string& filename, const std::vector<std::string>& additionalLines) {
+    // std::ofstream outFile(filename);
+    // if (!outFile) {
+    //     std::cerr << "Error: Couldn't open file for writing\n";
+    //     return;
+    // }
+
+    // for (const auto& line : additionalLines) {
+    //     outFile << line << "\n";
+    // }
+
+    // outFile << "StartOfPoints"<<std::endl;
+
+    // for (const auto& point : points) {
+    //     outFile << point.distance << " " << point.angle << "\n";
+    // }
+
+    // outFile.close();
 
 
+    cout << "START OF FILE" << endl;
+    for (const auto& line : additionalLines) {
+        cout << line << "\n";
+    }
+
+    cout << "StartOfPoints"<<std::endl;
+
+    for (const auto& point : points) {
+        cout << point.distance << " " << point.angle << endl;
+    }
+}
 
 uint64_t GetTimestamp(void)
 {
@@ -116,22 +137,11 @@ int main(int argc, char **argv)
   while (true)
   {
     // Accept connection from client
-    clientSocket = accept(serverSocket, (struct sockaddr *)&clientAddr, &clientAddrLen);
-    if (clientSocket == -1)
-    {
-      std::cerr << "Error accepting connection" << std::endl;
-      close(serverSocket);
-      return 1;
-    }
-
-    std::cout << "Client connected" << std::endl;
-    bool clientConnected = true;
-
     ldlidar::Points2D laser_scan_points;
 
     LidarServer* lidarServer = new LidarServer();//server used to treat the given points
 
-    while (ldlidar::LDLidarDriverLinuxInterface::Ok() && clientConnected)
+    while (ldlidar::LDLidarDriverLinuxInterface::Ok())
     {
       std::string ready;
       std::cout << "ready for measure (write anything)" << endl;
@@ -215,7 +225,6 @@ int main(int argc, char **argv)
       case ldlidar::LidarStatus::DATA_TIME_OUT:
       {
         LOG_ERROR_LITE("point cloud data publish time out, please check your lidar device.", "");
-        lidar_drv->Stop();
         break;
       }
       case ldlidar::LidarStatus::DATA_WAIT:
@@ -245,26 +254,3 @@ int main(int argc, char **argv)
 
 
 
-//#include "include/ldlidar_driver/ldlidar_driver_linux.h"
-using namespace std;
-
-void saveData(const std::vector<Point>& points, const std::string& filename, const std::vector<std::string>& additionalLines) {
-    std::ofstream outFile(filename);
-    if (!outFile) {
-        std::cerr << "Error: Couldn't open file for writing\n";
-        return;
-    }
-
-    for (const auto& line : additionalLines) {
-        outFile << line << "\n";
-    }
-
-    outFile << "StartOfPoints"<<std::endl;
-
-
-    for (const auto& point : points) {
-        outFile << point.distance << " " << point.angle << "\n";
-    }
-
-    outFile.close();
-}
