@@ -9,6 +9,8 @@
 #include "ldlidar_driver/ldlidar_driver_linux.h"
 #include "lidarServer_lib/LidarServer.h"
 #include "lidarServer_lib/Point.h"
+#include <iostream>
+#include <fstream>
 
 
 // int main(){
@@ -131,11 +133,14 @@ int main(int argc, char **argv)
 
     while (ldlidar::LDLidarDriverLinuxInterface::Ok() && clientConnected)
     {
+      std::string ready;
+      std::cout << "ready for measure (write anything)" << endl;
+      cin >> ready;
+             std::cout << "----------------- "<<std::endl;
       switch (lidar_drv->GetLaserScanData(laser_scan_points, 500))
       {
       case ldlidar::LidarStatus::NORMAL:
       {
-
         vector<Point> lidarPoints;
         Point point;
          for (auto pointLaser : laser_scan_points) {
@@ -144,34 +149,68 @@ int main(int argc, char **argv)
             lidarPoints.push_back(point);
         }
 
-        map<string, double> positions;
-        lidarServer->updatePoints(lidarPoints);
-        positions = lidarServer->detectObstacles();
+        const std::string path = "../testData/";
+       std::cout << "Enter the name of the file: ";
+       std::string name;
+       std::cin >> name;
+       const std::string filename = path + name + ".txt";
+       std::vector<std::string> additionalLines;
 
-        const std::string message = std::string(
-                            std::string("{\"distanceRightWall\": ") + std::to_string(positions["rightWall"] - 80) +
-                              std::string(", \"distanceFrontWall\": ") + std::to_string(positions["frontWall"] - 60) +
-                              std::string(", \"deviationAngle\": ") + std::to_string(positions["angle"]) + std::string("}"));
+       std::cout << "0 for wall follow, 1 for intersection, 2 to eliminate this measure, other to end process ";
+       std::string mode;
+       std::cin >> mode;
+       additionalLines.push_back(mode);
 
-        // Prepend the message length to the JSON data
-        uint32_t msg_length = message.length();
-        // Convert the message length to network byte order (big-endian)
-        uint32_t network_order_msg_length = htonl(msg_length);
+       if (mode == "0") {
+           std::cout << "Enter the ANGLE of deviation : ";
+           std::string angleAnswer;
+           std::cin >> angleAnswer;
 
-        // Send the message length
-        if (send(clientSocket, &network_order_msg_length, sizeof(network_order_msg_length), MSG_NOSIGNAL) == -1)
-        {
-            std::cerr << "Error sending data" << std::endl;
-            clientConnected = false;
-        }
+           std::cout << "Enter the RIGHT wall: ";
+           std::string rightWallAnswer;
+           std::cin >> rightWallAnswer;
 
-        // Send data to server
-        if (send(clientSocket, message.c_str(), msg_length, MSG_NOSIGNAL) == -1)
-        {
-            std::cerr << "Error sending data" << std::endl;
-            clientConnected = false;
-        }
-        break;
+           std::cout << "Enter the FRONT wall : ";
+           std::string frontWallAnswer;
+           std::cin >> frontWallAnswer;
+
+           additionalLines.push_back(angleAnswer);
+           additionalLines.push_back(rightWallAnswer);
+           additionalLines.push_back(frontWallAnswer);
+       }
+
+       if (mode == "1") {
+           std::cout << "Enter the ANGLE of deviation in the intersection: ";
+           std::string angleAnswer;
+           std::cin >> angleAnswer;
+
+           std::cout << "Enter the RIGHT intersection of deviation: ";
+           std::string rightWallAnswer;
+           std::cin >> rightWallAnswer;
+
+           std::cout << "Enter the FRONT wall of deviation : ";
+           std::string frontWallAnswer;
+           std::cin >> frontWallAnswer;
+
+           additionalLines.push_back(angleAnswer);
+           additionalLines.push_back(rightWallAnswer);
+           additionalLines.push_back(frontWallAnswer);
+       }
+
+       if (mode == "2") {
+           std::cout << "Cancelling this measure : " << std::endl;
+           continue;
+       }
+
+       if (mode != "1" && mode != "0" && mode != "2") {
+           std::cout << "Ending sampling : " <<std::endl;
+           return 0;
+       }
+
+
+
+       // Save data to file
+       saveData(lidarPoints, filename, additionalLines);
       }
       case ldlidar::LidarStatus::DATA_TIME_OUT:
       {
@@ -188,6 +227,8 @@ int main(int argc, char **argv)
       }
 
       usleep(1000 * 100); // sleep 100ms , 10hz
+      
+      std::cout << "----------------- "<<std::endl;
     }
   }
 
@@ -200,4 +241,30 @@ int main(int argc, char **argv)
   ldlidar::LDLidarDriverLinuxInterface::Destory(lidar_drv);
 
   return 0;
+}
+
+
+
+//#include "include/ldlidar_driver/ldlidar_driver_linux.h"
+using namespace std;
+
+void saveData(const std::vector<Point>& points, const std::string& filename, const std::vector<std::string>& additionalLines) {
+    std::ofstream outFile(filename);
+    if (!outFile) {
+        std::cerr << "Error: Couldn't open file for writing\n";
+        return;
+    }
+
+    for (const auto& line : additionalLines) {
+        outFile << line << "\n";
+    }
+
+    outFile << "StartOfPoints"<<std::endl;
+
+
+    for (const auto& point : points) {
+        outFile << point.distance << " " << point.angle << "\n";
+    }
+
+    outFile.close();
 }
