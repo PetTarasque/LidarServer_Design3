@@ -152,7 +152,7 @@ int main(int argc, char **argv)
             const std::string message = std::string(
                     std::string("{\"distanceRightWall\": ") + std::to_string(positions["rightWall"] - 80) +
                     std::string(", \"distanceFrontWall\": ") + std::to_string(positions["frontWall"] - 60) +
-                    std::string(", \"deviationAngle\": ") + std::to_string(positions["angle"]) + std::string("}"));
+                    std::string(", \"deviationAngle\": ") + std::to_string((-1)*positions["angle"]) + std::string("}"));
 
             // Prepend the message length to the JSON data
             uint32_t msg_length = message.length();
