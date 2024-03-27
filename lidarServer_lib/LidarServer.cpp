@@ -13,7 +13,6 @@
 
 #include "LidarServer.h"
 
-
 using namespace std;
 
 
@@ -77,8 +76,13 @@ Point LidarServer::calculateAveragePointOfArc(const std::vector<Point>& points) 
     double distanceSum = 0.0;
     double angleSum = 0.0;
     for (const auto& point : points) {
-        distanceSum += point.distance;
-        angleSum += point.angle;
+        if (point.angle < 180){
+            angleSum += point.angle+360;
+            distanceSum += point.distance;
+        } else {
+            distanceSum += point.distance;
+            angleSum += point.angle;
+        }
     }
     Point pointAverage{};
     points.empty() ? pointAverage.angle = 0.0, pointAverage.distance=0.0 :
@@ -154,26 +158,51 @@ double LidarServer::middleOfArc(pair<double, double> arc){
 };
 
 pair<double, double> LidarServer::calculateRightWallPositions() {
-    /** TODO
-     * should have a logic to deal with m_points that aren't valid.
-     * maybe have 3 triangles taken across the wall and compare them
-     * an arc sample should also verify if there's enough m_points for the sample, and if not, increase the aperture of the angle
-     * or take another point
-     */
-
+    int ANGLE_INTERVAL = 4;
     vector<Point> filteredPoint = getPointsInInterval(right_arc);
 
-    pair<double, double> samplingForFirstPoint= splitArcInSubInterval(right_arc, 6, 2);
+    std::vector<std::pair<double, double>> samples;
+    //check the side of the robot
+    samples.push_back(triangulate(4, 6));
+    samples.push_back(triangulate(5, 7));
+    samples.push_back(triangulate(6, 8));
+    samples.push_back(triangulate(7, 9));
+    //if no wall are detected, check in front
+    samples.push_back(triangulate(1, 3));
+    samples.push_back(triangulate(2, 4));
+    samples.push_back(triangulate(3, 5));
+    samples.push_back(triangulate(4, 6));
+//
+//    sort(samples.begin(), samples.end(),
+//              [](const auto& lhs, const auto& rhs) {
+//                  return lhs.second< rhs.second;
+//              });
+
+    pair<double, double> previousSample = {1000, 10000};
+    cout << endl;
+    cout << "start  : "<<endl;
+    for (const auto& sample : samples) {
+        cout<<"sample : "<<sample.first<< " "<< sample.second<<endl;
+        if (abs(sample.second-previousSample.second) < ANGLE_INTERVAL){
+            return {(sample.first+previousSample.first)/2, (sample.second+previousSample.second)/2};
+        }
+        previousSample = sample;
+    }
+    throw std::runtime_error("this sample should be ignored");
+}
+
+pair<double, double> LidarServer::triangulate(int firstSectionSelected, int secondSectionSelected){
+    pair<double, double> samplingForFirstPoint= splitArcInSubInterval(right_arc, 9, firstSectionSelected);
     Point A = calculateAveragePointOfArc(getPointsInInterval(samplingForFirstPoint));
 
-    pair<double, double> samplingForSecondPoint= splitArcInSubInterval(right_arc, 6, 5);
+    pair<double, double> samplingForSecondPoint= splitArcInSubInterval(right_arc, 9, secondSectionSelected);
+
     Point B = calculateAveragePointOfArc(getPointsInInterval(samplingForSecondPoint));
 
     double Angle = angleBetweenArcs(samplingForFirstPoint, samplingForSecondPoint);
 
     double triangleHeight = calculateHeightTriangle(A.distance, B.distance, Angle);
     double deviation = calculateDeviation(A.distance, B.distance, B.angle, Angle);
-
     return {triangleHeight, deviation};
 }
 

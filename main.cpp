@@ -146,32 +146,34 @@ int main(int argc, char **argv)
 
         map<string, double> positions;
         lidarServer->updatePoints(lidarPoints);
-        positions = lidarServer->detectObstacles();
+        try {
+            positions = lidarServer->detectObstacles();
 
-        const std::string message = std::string(
-                            std::string("{\"distanceRightWall\": ") + std::to_string(positions["rightWall"] - 80) +
-                              std::string(", \"distanceFrontWall\": ") + std::to_string(positions["frontWall"] - 60) +
-                              std::string(", \"deviationAngle\": ") + std::to_string(positions["angle"]) + std::string("}"));
+            const std::string message = std::string(
+                    std::string("{\"distanceRightWall\": ") + std::to_string(positions["rightWall"] - 80) +
+                    std::string(", \"distanceFrontWall\": ") + std::to_string(positions["frontWall"] - 60) +
+                    std::string(", \"deviationAngle\": ") + std::to_string(positions["angle"]) + std::string("}"));
 
-        // Prepend the message length to the JSON data
-        uint32_t msg_length = message.length();
-        // Convert the message length to network byte order (big-endian)
-        uint32_t network_order_msg_length = htonl(msg_length);
+            // Prepend the message length to the JSON data
+            uint32_t msg_length = message.length();
+            // Convert the message length to network byte order (big-endian)
+            uint32_t network_order_msg_length = htonl(msg_length);
 
-        // Send the message length
-        if (send(clientSocket, &network_order_msg_length, sizeof(network_order_msg_length), MSG_NOSIGNAL) == -1)
-        {
-            std::cerr << "Error sending data" << std::endl;
-            clientConnected = false;
+            // Send the message length
+            if (send(clientSocket, &network_order_msg_length, sizeof(network_order_msg_length), MSG_NOSIGNAL) == -1) {
+                std::cerr << "Error sending data" << std::endl;
+                clientConnected = false;
+            }
+
+            // Send data to server
+            if (send(clientSocket, message.c_str(), msg_length, MSG_NOSIGNAL) == -1) {
+                std::cerr << "Error sending data" << std::endl;
+                clientConnected = false;
+            }
+            break;
+        } catch (const std::runtime_error& e){
+            std::cerr << "This is supposed to have been ignored."<< std::endl;
         }
-
-        // Send data to server
-        if (send(clientSocket, message.c_str(), msg_length, MSG_NOSIGNAL) == -1)
-        {
-            std::cerr << "Error sending data" << std::endl;
-            clientConnected = false;
-        }
-        break;
       }
       case ldlidar::LidarStatus::DATA_TIME_OUT:
       {

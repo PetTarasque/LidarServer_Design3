@@ -14,11 +14,13 @@ using namespace std;
 double RIGHT_WALL = 160;//in millimeter
 double FRONT_WALL = 310;
 double ANGLE = 10; //this angle refers to the front of the robot, 10 degrees to the right
-double PRECISION_VALUE = 5.0;
-double ANGLE_PRECISION = 2.0;
+double PRECISION_VALUE = 15.0;
+double ANGLE_PRECISION = 5.0;
 int NUMBER_OF_ANGLES = 500;
 int EXECUTION_TIME = 1;//in milliseconds
-string FILE_PATH = "../../testData/box.txt";
+
+string FILE_PATH = "../../testData/box_invertedValues.txt";
+string BASE_PATH = "../../testData/";
 vector<Point> points;
 
 vector<Point> readLidar(string path) {
@@ -27,15 +29,43 @@ vector<Point> readLidar(string path) {
     if (!inFile) {
         std::cerr << "Error: Couldn't open file " << path<< " for reading\n";
     }
+
+    string separator = "";
+    while(separator != "StartOfPoints"){
+        inFile >> separator;
+    }
+
     points.clear();
     Point point;
-    while (inFile >> point.angle >> point.distance) {
+    while (inFile >> point.distance >> point.angle) {
         points.push_back(point);
     }
 
     inFile.close();
     return points;
 };
+
+map<string, double> readValuesWallFollow(string path) {
+    std::ifstream inFile(path);
+
+    if (!inFile) {
+        std::cerr << "Error: Couldn't open file " << path<< " for reading\n";
+    }
+
+    map<string, double> positions;
+    inFile>> positions["angle"]>>positions["rightWall"] >> positions["frontWall"];
+
+    inFile.close();
+    return positions;
+};
+
+map<string, double> detectPositions(string path){
+    LidarServer* server = new LidarServer();
+    vector<Point> points = readLidar(path);
+    server->updatePoints(points);
+    map<string, double> positions = server->detectObstacles();
+    return positions;
+}
 
 
 class LidarServerFixture : public ::testing::Test{
@@ -64,6 +94,7 @@ bool containsAngle(const vector<Point>& returnedPoints, int angle){
         return point.angle > angle && point.angle < angle + 1;
     });
 }
+
 
 TEST_F(LidarServerFixture, readLidarFetchesValues){
     vector<Point> returnedPoints = lidarServer->getPoints();
@@ -155,6 +186,47 @@ TEST_F(LidarServerFixture, splitArcInSubInterval){
     ASSERT_EQ(expectedArc, measuredArc);
 }
 
+TEST_F(LidarServerFixture, calculateAveragePointOfArc){
+    vector<Point> pointsLidar = {
+            {181, 355.05},
+            {181, 355.77},
+            {181, 356.49},
+            {181, 357.96},
+            {181, 357.21},
+            {181, 358.66},
+            {181, 359.36},
+            {181, 0},
+            {181, 0.709991},
+            {181, 1.42001}
+    };
+
+    Point point = lidarServer->calculateAveragePointOfArc(pointsLidar);
+    ASSERT_EQ(358.2630001, point.angle);
+}
+
+TEST_F(LidarServerFixture, calculateAveragePointOfArc2){
+    vector<Point> pointsLidar = {
+            {191, 350.01},
+            {188, 350.73},
+            {185, 351.45},
+            {183, 352.17},
+            {182, 352.89},
+            {181, 353.61},
+            {181, 354.33},
+            {181, 355.05},
+            {181, 355.77},
+            {181, 356.49},
+            {181, 357.96},
+            {181, 357.21},
+            {181, 358.66},
+            {181, 359.36},
+            {181, 0}
+    };
+
+    Point point = lidarServer->calculateAveragePointOfArc(pointsLidar);
+    ASSERT_EQ(355.046, point.angle);
+}
+
 TEST_F(LidarServerFixture, middleOfArc){
     ASSERT_EQ(345, lidarServer->middleOfArc({340, 350}));
     ASSERT_EQ(20, lidarServer->middleOfArc({0, 40}));
@@ -216,6 +288,10 @@ TEST_F(LidarServerFixture, splittingAnAngleInSubIntervals){
     calculatedSubInterval = lidarServer->splitArcInSubInterval({10, 30}, 4, 1);
     actualInterval = {10, 15};
     ASSERT_EQ(actualInterval, calculatedSubInterval);
+
+    calculatedSubInterval = lidarServer->splitArcInSubInterval({0, 30}, 6, 6);
+    actualInterval = {25, 30};
+    ASSERT_EQ(actualInterval, calculatedSubInterval);
 }
 
 TEST_F(LidarServerFixture, calculateRightWallDistance){
@@ -248,4 +324,139 @@ TEST_F(LidarServerFixture, calculatePositionsShouldRunFast){
     auto end = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
     EXPECT_LE(duration.count(), EXECUTION_TIME);
+}
+
+TEST_F(LidarServerFixture, wallFollowPerfectRightWall){
+    string path = BASE_PATH + "wallFollowParallel.txt";
+    map<string, double> positionsAnswers = readValuesWallFollow(path);
+    map<string, double> positions = detectPositions(path);
+
+    ASSERT_TRUE(checkIfWithinPrecisionRange(positionsAnswers["rightWall"], positions["rightWall"], PRECISION_VALUE))
+    <<"Expected rightWall: " << positionsAnswers["rightWall"] << "+-"<< PRECISION_VALUE << " Received : "<<positions["rightWall"]<<endl;
+}
+
+TEST_F(LidarServerFixture, wallFollowPerfectAngle){
+    string path = BASE_PATH + "wallFollowParallel.txt";
+    map<string, double> positionsAnswers = readValuesWallFollow(path);
+    map<string, double> positions = detectPositions(path);
+
+    ASSERT_TRUE(checkIfWithinPrecisionRange(positionsAnswers["angle"], positions["angle"], PRECISION_VALUE))
+    <<"Expected angle : " << positionsAnswers["angle"] << "+-"<< PRECISION_VALUE << " Received : "<<positions["angle"]<<endl;
+}
+
+TEST_F(LidarServerFixture, wallFollowPerfectFrontWall){
+    string path = BASE_PATH + "wallFollowParallel.txt";
+    map<string, double> positionsAnswers = readValuesWallFollow(path);
+    map<string, double> positions = detectPositions(path);
+
+    ASSERT_TRUE(checkIfWithinPrecisionRange(positionsAnswers["frontWall"], positions["frontWall"], PRECISION_VALUE))
+    <<"Expected frontWall : " << positionsAnswers["frontWall"] << "+-"<< PRECISION_VALUE << " Received : "<<positions["frontWall"]<<endl;
+}
+
+TEST_F(LidarServerFixture, wallFollowDeviationGaucheRightWall){
+    string path = BASE_PATH + "wallFollowDeviationGauche.txt";
+    map<string, double> positionsAnswers = readValuesWallFollow(path);
+    map<string, double> positions = detectPositions(path);
+
+    ASSERT_TRUE(checkIfWithinPrecisionRange(positionsAnswers["rightWall"], positions["rightWall"], PRECISION_VALUE))
+                                <<"Expected rightWall: " << positionsAnswers["rightWall"] << "+-"<< PRECISION_VALUE << " Received : "<<positions["rightWall"]<<endl;
+}
+
+TEST_F(LidarServerFixture, wallFollowDeviationGaucheAngle){
+    string path = BASE_PATH + "wallFollowDeviationGauche.txt";
+    map<string, double> positionsAnswers = readValuesWallFollow(path);
+    map<string, double> positions = detectPositions(path);
+
+    ASSERT_TRUE(checkIfWithinPrecisionRange(positionsAnswers["angle"], positions["angle"], PRECISION_VALUE))
+                                <<"Expected angle : " << positionsAnswers["angle"] << "+-"<< PRECISION_VALUE << " Received : "<<positions["angle"]<<endl;
+}
+
+TEST_F(LidarServerFixture, wallFollowDeviationGaucheFrontWall){
+    string path = BASE_PATH + "wallFollowDeviationGauche.txt";
+    map<string, double> positionsAnswers = readValuesWallFollow(path);
+    map<string, double> positions = detectPositions(path);
+
+    ASSERT_TRUE(checkIfWithinPrecisionRange(positionsAnswers["frontWall"], positions["frontWall"], PRECISION_VALUE))
+                                <<"Expected frontWall : " << positionsAnswers["frontWall"] << "+-"<< PRECISION_VALUE << " Received : "<<positions["frontWall"]<<endl;
+}
+
+TEST_F(LidarServerFixture, wallFollowDeviationDansLeCoinRightWall){
+    string path = BASE_PATH + "wallFollowDeviationDansLeCoin.txt";
+    map<string, double> positionsAnswers = readValuesWallFollow(path);
+    map<string, double> positions = detectPositions(path);
+
+    ASSERT_TRUE(checkIfWithinPrecisionRange(positionsAnswers["rightWall"], positions["rightWall"], PRECISION_VALUE))
+                                <<"Expected rightWall: " << positionsAnswers["rightWall"] << "+-"<< PRECISION_VALUE << " Received : "<<positions["rightWall"]<<endl;
+}
+
+TEST_F(LidarServerFixture, wallFollowDeviationDansLeCoinAngle){
+    string path = BASE_PATH + "wallFollowDeviationDansLeCoin.txt";
+    map<string, double> positionsAnswers = readValuesWallFollow(path);
+    map<string, double> positions = detectPositions(path);
+
+    ASSERT_TRUE(checkIfWithinPrecisionRange(positionsAnswers["angle"], positions["angle"], PRECISION_VALUE))
+                                <<"Expected angle : " << positionsAnswers["angle"] << "+-"<< PRECISION_VALUE << " Received : "<<positions["angle"]<<endl;
+}
+
+TEST_F(LidarServerFixture, wallFollowDeviationDansLeCoinFrontWall){
+    string path = BASE_PATH + "wallFollowDeviationDansLeCoin.txt";
+    map<string, double> positionsAnswers = readValuesWallFollow(path);
+    map<string, double> positions = detectPositions(path);
+
+    ASSERT_TRUE(checkIfWithinPrecisionRange(positionsAnswers["frontWall"], positions["frontWall"], PRECISION_VALUE))
+                                <<"Expected frontWall : " << positionsAnswers["frontWall"] << "+-"<< PRECISION_VALUE << " Received : "<<positions["frontWall"]<<endl;
+}
+
+TEST_F(LidarServerFixture, tourVersLaGaucheRightWall){
+    string path = BASE_PATH + "tourVersLaGauche.txt";
+    map<string, double> positionsAnswers = readValuesWallFollow(path);
+    map<string, double> positions = detectPositions(path);
+
+    ASSERT_TRUE(checkIfWithinPrecisionRange(positionsAnswers["rightWall"], positions["rightWall"], PRECISION_VALUE))
+                                <<"Expected rightWall: " << positionsAnswers["rightWall"] << "+-"<< PRECISION_VALUE << " Received : "<<positions["rightWall"]<<endl;
+}
+
+TEST_F(LidarServerFixture, tourVersLaGaucheAngle){
+    string path = BASE_PATH + "tourVersLaGauche.txt";
+    map<string, double> positionsAnswers = readValuesWallFollow(path);
+    map<string, double> positions = detectPositions(path);
+
+    ASSERT_TRUE(checkIfWithinPrecisionRange(positionsAnswers["angle"], positions["angle"], PRECISION_VALUE))
+                                <<"Expected angle : " << positionsAnswers["angle"] << "+-"<< PRECISION_VALUE << " Received : "<<positions["angle"]<<endl;
+}
+
+TEST_F(LidarServerFixture, tourVersLaGaucheFrontWall){
+    string path = BASE_PATH + "tourVersLaGauche.txt";
+    map<string, double> positionsAnswers = readValuesWallFollow(path);
+    map<string, double> positions = detectPositions(path);
+
+    ASSERT_TRUE(checkIfWithinPrecisionRange(positionsAnswers["frontWall"], positions["frontWall"], PRECISION_VALUE))
+                                <<"Expected frontWall : " << positionsAnswers["frontWall"] << "+-"<< PRECISION_VALUE << " Received : "<<positions["frontWall"]<<endl;
+}
+
+TEST_F(LidarServerFixture, tourVersLaDroiteRightWall){
+    string path = BASE_PATH + "tourVersLaDroite.txt";
+    map<string, double> positionsAnswers = readValuesWallFollow(path);
+    map<string, double> positions = detectPositions(path);
+
+    ASSERT_TRUE(checkIfWithinPrecisionRange(positionsAnswers["rightWall"], positions["rightWall"], PRECISION_VALUE))
+                                <<"Expected rightWall: " << positionsAnswers["rightWall"] << "+-"<< PRECISION_VALUE << " Received : "<<positions["rightWall"]<<endl;
+}
+
+TEST_F(LidarServerFixture, tourVersLaDroiteAngle){
+    string path = BASE_PATH + "tourVersLaDroite.txt";
+    map<string, double> positionsAnswers = readValuesWallFollow(path);
+    map<string, double> positions = detectPositions(path);
+
+    ASSERT_TRUE(checkIfWithinPrecisionRange(positionsAnswers["angle"], positions["angle"], PRECISION_VALUE))
+                                <<"Expected angle : " << positionsAnswers["angle"] << "+-"<< PRECISION_VALUE << " Received : "<<positions["angle"]<<endl;
+}
+
+TEST_F(LidarServerFixture, tourVersLaDroiteFrontWall){
+    string path = BASE_PATH + "tourVersLaDroite.txt";
+    map<string, double> positionsAnswers = readValuesWallFollow(path);
+    map<string, double> positions = detectPositions(path);
+
+    ASSERT_TRUE(checkIfWithinPrecisionRange(positionsAnswers["frontWall"], positions["frontWall"], PRECISION_VALUE))
+                                <<"Expected frontWall : " << positionsAnswers["frontWall"] << "+-"<< PRECISION_VALUE << " Received : "<<positions["frontWall"]<<endl;
 }

@@ -15,7 +15,7 @@ using namespace std;
 class LidarServer {
 private:
     vector<Point> m_points;
-    pair<int, int> right_arc = {300, 0};
+    pair<int, int> right_arc = {270, 359};
     pair<int, int> frontal_arc = {265, 275};
 
 public:
@@ -40,6 +40,7 @@ public:
     static double angleBetweenArcs(pair<double, double> firstArc, pair<double, double> secondArc);
     static double middleOfArc(pair<double, double> arc);
     double calculateFrontWallDistance(double deviationAngle);
+    pair<double, double> triangulate(int firstSectionSelected, int secondSectionSelected);
 };
 
 
