@@ -39,7 +39,7 @@ public:
     std::string getPositions();
     void calculateData();
     void resetValues();
-    std::string formatMessage();
+    std::string formatPositions();
     void calculateDeviation();
     void calculateRightWallDistance();
     void calculateFrontWallDistance();

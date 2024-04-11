@@ -21,35 +21,39 @@ void LidarServer::updatePoints(ldlidar::Points2D laser_scan_points){
     m_points = std::move(laser_scan_points);;
 }
 
-int cosDistance(int angle, int distance, int referenceAngle){
-    return (int) (distance * cos(abs(referenceAngle - angle) * M_PI / 180));
+double toRadians(int angle){
+    return angle*M_PI/180;
 }
 
-bool frontArc(int angle){
+int cosDistanceWithReferenceAngle(int angle, int distance, int referenceAngle){
+    return (int) (distance * cos(toRadians(abs(referenceAngle - angle))));
+}
+
+bool isFrontArc(int angle){
     return angle > 255 && angle < 285;
 }
 
-bool frontRightArc(int angle){
+bool isFrontRightArc(int angle){
     return angle > 300 && angle < 330;
 }
 
-bool rightAnchorArc(int angle){
+bool isRightAnchorArc(int angle){
     return angle > 315 || angle < 45;
 }
 
-bool behindRightArc(int angle){
+bool isBehindRightArc(int angle){
     return angle > 30 && angle < 60;
 }
 
-bool leftAnchorArc(int angle){
+bool isLeftAnchorArc(int angle){
     return angle > 135 && angle < 225;
 }
 
-bool leftArc(int angle){
+bool isLeftArc(int angle){
     return angle > 172.5 && angle < 187.5;
 }
 
-bool behindLeftArc(int angle){
+bool isBehindLeftArc(int angle){
     return angle > 157.5 && angle < 172.5;
 }
 
@@ -81,47 +85,47 @@ void LidarServer::calculateData(){
             continue;
         }
         
-        if (frontArc(angle)) {
-            frontDistanceTotal += cosDistance(angle, distance, 270);
+        if (isFrontArc(angle)) {
+            frontDistanceTotal += cosDistanceWithReferenceAngle(angle, distance, 270);
             nbFrontDistancePoints++;
         }
-        else if (frontRightArc(angle)) {
-            frontRightDistanceTotal += cosDistance(angle, distance, 315);
+        else if (isFrontRightArc(angle)) {
+            frontRightDistanceTotal += cosDistanceWithReferenceAngle(angle, distance, 315);
             nbFrontRightDistancePoints++;
         }
-        if (rightAnchorArc(angle)) {
+        if (isRightAnchorArc(angle)) {
             if (distance < rightAnchorDistance) {
                 rightAnchorDistance = distance;
             }
 
             else if (angle > 345) {
-            rightDistanceTotal += cosDistance(angle, distance, 360);
-            rightFrontHalfDistanceTotal += cosDistance(angle, distance, 352.5);
-            nbRightDistancePoints++;
-            nbRightFrontHalfDistancePoints++;
+                rightDistanceTotal += cosDistanceWithReferenceAngle(angle, distance, 360);
+                rightFrontHalfDistanceTotal += cosDistanceWithReferenceAngle(angle, distance, 352.5);
+                nbRightDistancePoints++;
+                nbRightFrontHalfDistancePoints++;
             }
             else if (angle < 15) {
-                rightDistanceTotal += cosDistance(angle, distance, 0);
-                rightBehindHalfDistanceTotal += cosDistance(angle, distance, 7.5);
+                rightDistanceTotal += cosDistanceWithReferenceAngle(angle, distance, 0);
+                rightBehindHalfDistanceTotal += cosDistanceWithReferenceAngle(angle, distance, 7.5);
                 nbRightDistancePoints++;
                 nbRightBehindHalfDistancePoints++;
             }
         }
-        else if (behindRightArc(angle)) {
-            behindRightDistanceTotal += cosDistance(angle, distance, 45);
+        else if (isBehindRightArc(angle)) {
+            behindRightDistanceTotal += cosDistanceWithReferenceAngle(angle, distance, 45);
             nbBehindRightDistancePoints++;
         }
-        else if (leftAnchorArc(angle)) {
+        else if (isLeftAnchorArc(angle)) {
             if (distance < leftAnchorDistance) {
                 leftAnchorDistance = distance;
             }
             
-            if (leftArc(angle)) {
-                leftDistanceTotal += cosDistance(angle, distance, 180);
+            if (isLeftArc(angle)) {
+                leftDistanceTotal += cosDistanceWithReferenceAngle(angle, distance, 180);
                 nbLeftDistancePoints++;
             }
-            else if (behindLeftArc(angle)) {
-                leftBehindHalfDistanceTotal += cosDistance(angle, distance, 165);
+            else if (isBehindLeftArc(angle)) {
+                leftBehindHalfDistanceTotal += cosDistanceWithReferenceAngle(angle, distance, 165);
                 nbLeftBehindHalfDistancePoints++;
             }
         }
@@ -153,8 +157,8 @@ void LidarServer::resetValues(){
 }
 
 void LidarServer::calculateDeviation(){
-    deviationAngle = atan((rightFrontHalfDistance * cos(7.5 * M_PI / 180) - rightBehindHalfDistance * cos(7.5 * M_PI / 180)) / 
-                                    (rightFrontHalfDistance * sin(7.5 * M_PI / 180) + rightBehindHalfDistance * sin(7.5 * M_PI / 180)));
+    deviationAngle = atan((rightFrontHalfDistance * cos(toRadians(7.5)) - rightBehindHalfDistance * cos(toRadians(7.5))) / 
+                                    (rightFrontHalfDistance * sin(toRadians(7.5)) + rightBehindHalfDistance * sin(toRadians(7.5))));
     if (isnan(deviationAngle)) {
         deviationAngle = 0.0;
     }
@@ -170,14 +174,14 @@ void LidarServer::calculateFrontWallDistance(){
 }
 
 void LidarServer::calculateDeviationAngleAlt(){
-    deviationAngleAlt = atan((leftBehindHalfDistance* cos(15 * M_PI / 180) - leftDistance) / 
-                                        (leftBehindHalfDistance * sin(15 * M_PI / 180)));
+    deviationAngleAlt = atan((leftBehindHalfDistance* cos(toRadians(15)) - leftDistance) / 
+                                        (leftBehindHalfDistance * sin(toRadians(15))));
     if (isnan(deviationAngleAlt)) {
         deviationAngleAlt = 0.0;
     }
 }
 
-std::string LidarServer::formatMessage(){
+std::string LidarServer::formatPositions(){
     return std::string("{\"distanceFront\": ") + std::to_string(frontDistance - 60) + 
                               std::string(", \"distanceFrontRight\": ") + std::to_string(frontRightDistance -  sqrt(pow(80, 2) + pow(60, 2))) + 
                               std::string(", \"distanceRight\": ") + std::to_string(rightDistance - 80) + 
@@ -192,13 +196,14 @@ std::string LidarServer::formatMessage(){
 }
 
 std::string LidarServer::getPositions(){
-        calculateData();
-        
-        calculateDeviation();
-        calculateFrontWallDistance();
-        calculateRightWallDistance();
-        calculateDeviationAngleAlt();
-        std::string formatedMessage = formatMessage();
-        resetValues();
-        return formatedMessage;
+    calculateData();
+
+    //calcuate Date before this part:
+    calculateDeviation();
+    calculateFrontWallDistance();
+    calculateRightWallDistance();
+    calculateDeviationAngleAlt();
+    std::string formatedPositions = formatPositions();
+    resetValues();
+    return formatedPositions;
 }
