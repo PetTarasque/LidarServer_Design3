@@ -8,18 +8,6 @@
 #include <cmath>
 #include "ldlidar_driver/ldlidar_driver_linux.h"
 #include "lidarServer_lib/LidarServer.h"
-#include "lidarServer_lib/Point.h"
-
-
-// int main(){
-//     LidarServer* lidarServer = new LidarServer();
-//     Point point;
-//     point.angle = 80.00;
-//     point.distance = 20.00;
-//     std::cout << point.angle << " " << point.distance<< std::endl;
-//     ldlidar::Points2D laser_scan_points;
-//     return 0;
-// }
 
 
 
@@ -134,47 +122,30 @@ int main(int argc, char **argv)
       switch (lidar_drv->GetLaserScanData(laser_scan_points, 500))
       {
       case ldlidar::LidarStatus::NORMAL:
-      {
+    {
+        lidarServer->updatePoints(laser_scan_points);
+        std::string message = lidarServer->getMessage();
 
-        vector<Point> lidarPoints;
-        Point point;
-         for (auto pointLaser : laser_scan_points) {
-            point.angle = pointLaser.angle;
-            point.distance = pointLaser.distance;
-            lidarPoints.push_back(point);
+        // Prepend the message length to the JSON data
+        uint32_t msg_length = message.length();
+        // Convert the message length to network byte order (big-endian)
+        uint32_t network_order_msg_length = htonl(msg_length);
+
+        // Send the message length
+        if (send(clientSocket, &network_order_msg_length, sizeof(network_order_msg_length), MSG_NOSIGNAL) == -1)
+        {
+            std::cerr << "Error sending data" << std::endl;
+            clientConnected = false;
         }
 
-        map<string, double> positions;
-        lidarServer->updatePoints(lidarPoints);
-        try {
-            positions = lidarServer->detectObstacles();
-            const std::string message = std::string(
-                    std::string("{\"distanceRightWall\": ") + std::to_string(positions["rightWall"] - 80) +
-                    std::string(", \"distanceFrontWall\": ") + std::to_string(positions["frontWall"]-20) +
-                    std::string(", \"deviationAngle\": ") + std::to_string((-1)*positions["angle"]* (M_PI / 180.0)) + std::string("}"));
-
-            // Prepend the message length to the JSON data
-            uint32_t msg_length = message.length();
-            // Convert the message length to network byte order (big-endian)
-            uint32_t network_order_msg_length = htonl(msg_length);
-            // Send the message length
-            if (send(clientSocket, &network_order_msg_length, sizeof(network_order_msg_length), MSG_NOSIGNAL) == -1) {
-                std::cerr << "Error sending data" << std::endl;
-                clientConnected = false;
-            }
-
-            cout << message<<endl;
-
-            // Send data to server
-            if (send(clientSocket, message.c_str(), msg_length, MSG_NOSIGNAL) == -1) {
-                std::cerr << "Error sending data" << std::endl;
-                clientConnected = false;
-            }
-        } catch (const std::runtime_error& e){
-            std::cerr << "This is supposed to have been ignored."<< std::endl;
+        // Send data to server
+        if (send(clientSocket, message.c_str(), msg_length, MSG_NOSIGNAL) == -1)
+        {
+            std::cerr << "Error sending data" << std::endl;
+            clientConnected = false;
         }
         break;
-      }
+    }
       case ldlidar::LidarStatus::DATA_TIME_OUT:
       {
         LOG_ERROR_LITE("point cloud data publish time out, please check your lidar device.", "");
