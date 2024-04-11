@@ -37,6 +37,10 @@ bool isFrontRightArc(int angle){
     return angle > 300 && angle < 330;
 }
 
+bool isFrontRightAnchorArc(int angle){
+    return angle > 270 && angle < 330;
+}
+
 bool isRightAnchorArc(int angle){
     return angle > 315 || angle < 45;
 }
@@ -89,9 +93,15 @@ void LidarServer::calculateData(){
             frontDistanceTotal += cosDistanceWithReferenceAngle(angle, distance, 270);
             nbFrontDistancePoints++;
         }
-        else if (isFrontRightArc(angle)) {
-            frontRightDistanceTotal += cosDistanceWithReferenceAngle(angle, distance, 315);
-            nbFrontRightDistancePoints++;
+        else if (isFrontRightAnchorArc(angle)) {
+            if (distance < frontRightAnchorDistance) {
+                frontRightAnchorDistance = cosDistanceWithReferenceAngle(angle, distance, 360);
+            }
+
+            if (isFrontRightArc(angle)) {
+                frontRightDistanceTotal += cosDistanceWithReferenceAngle(angle, distance, 315);
+                nbFrontRightDistancePoints++;
+            } 
         }
         if (isRightAnchorArc(angle)) {
             if (distance < rightAnchorDistance) {
@@ -150,10 +160,15 @@ void LidarServer::resetValues(){
     rightBehindHalfDistance = 0;
     leftDistance = 0;
     leftBehindHalfDistance = 0;
-    rightWallDistance =0;
-    frontWallDistance=0;
+    rightWallDistance = 0;
+    frontWallDistance = 0;
+
     deviationAngle = 0.0;
-    deviationAngleAlt =0.0;
+    deviationAngleAlt = 0.0;
+
+    frontRightAnchorDistance = 800;
+    leftAnchorDistance = 610;
+    rightAnchorDistance = 610;
 }
 
 void LidarServer::calculateDeviation(){
@@ -190,6 +205,7 @@ std::string LidarServer::formatPositions(){
                               std::string(", \"distanceFrontWall\": ") + std::to_string(frontWallDistance - 60) +
                               std::string(", \"distanceLeftAnchor\": ") + std::to_string(leftAnchorDistance - 80) + 
                               std::string(", \"distanceRightAnchor\": ") + std::to_string(rightAnchorDistance - 80) + 
+                              std::string(", \"distanceFrontRightAnchor\": ") + std::to_string(frontRightAnchorDistance - 80) + 
                               std::string(", \"deviationAngle\": ") + std::to_string(deviationAngle) +
                               std::string(", \"deviationAngleAlt\": ") + std::to_string(deviationAngleAlt) + std::string("}");
         
@@ -198,7 +214,7 @@ std::string LidarServer::formatPositions(){
 std::string LidarServer::getPositions(){
     calculateData();
 
-    //calcuate Date before this part:
+    //calcuate Data before this part:
     calculateDeviation();
     calculateFrontWallDistance();
     calculateRightWallDistance();

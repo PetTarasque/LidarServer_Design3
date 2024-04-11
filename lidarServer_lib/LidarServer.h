@@ -25,11 +25,14 @@ private:
     int leftBehindHalfDistance;
     int rightWallDistance;
     int frontWallDistance;
+
     float deviationAngle;
     float deviationAngleAlt;
 
+    int frontRightAnchorDistance = 800;
     int leftAnchorDistance = 610;
     int rightAnchorDistance = 610;
+    
     ldlidar::Points2D m_points;
 
 public:
