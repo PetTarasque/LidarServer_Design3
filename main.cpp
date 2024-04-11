@@ -124,7 +124,7 @@ int main(int argc, char **argv)
       case ldlidar::LidarStatus::NORMAL:
     {
         lidarServer->updatePoints(laser_scan_points);
-        std::string message = lidarServer->getMessage();
+        std::string message = lidarServer->getPositions();
 
         // Prepend the message length to the JSON data
         uint32_t msg_length = message.length();

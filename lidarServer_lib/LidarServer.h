@@ -23,6 +23,10 @@ private:
     int rightBehindHalfDistance;
     int leftDistance;
     int leftBehindHalfDistance;
+    int rightWallDistance;
+    int frontWallDistance;
+    float deviationAngle;
+    float deviationAngleAlt;
 
     int leftAnchorDistance = 610;
     int rightAnchorDistance = 610;
@@ -32,20 +36,13 @@ public:
     map<string, double> detectObstacles();
     void updatePoints(ldlidar::Points2D laser_scan_points);
 
-    std::string getMessage();
-    void computeData();
+    std::string getPositions();
+    void calculateData();
     void resetValues();
-
-    //don't touch the following functions
-    void cleanValues();
-    void deleteValuesCollidingWithRobot();
-    void deleteAbhorrentValues();
-    map<string, double> calculatePositions();
-
-    static ldlidar::PointData calculateAveragePointOfArc(const std::vector<ldlidar::PointData>& points);
-    vector<ldlidar::PointData> getPoints();
-    vector<ldlidar::PointData> getPointsInInterval(pair<int, int> arc);
+    std::string formatMessage();
+    void calculateDeviation();
+    void calculateRightWallDistance();
+    void calculateFrontWallDistance();
+    void calculateDeviationAngleAlt();
 };
-
-
 #endif //UNTITLED1_LIDARSERVER_H
