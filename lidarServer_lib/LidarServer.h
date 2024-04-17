@@ -31,6 +31,7 @@ private:
 
     int frontRightAnchorDistance = 800;
     int leftAnchorDistance = 610;
+    int lastLeftAnchorDistance = 0;
     int rightAnchorDistance = 610;
     
     ldlidar::Points2D m_points;

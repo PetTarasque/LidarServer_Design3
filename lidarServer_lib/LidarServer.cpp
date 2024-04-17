@@ -81,9 +81,9 @@ void LidarServer::calculateData(){
     int leftDistanceTotal = 0;
     int leftBehindHalfDistanceTotal = 0;
 
-    for (auto point : m_points) {
-        int distance = point.distance;
-        int angle = point.angle;
+    for (int i = 0; i < m_points.size(); i++) {
+        int distance = m_points[i].distance;
+        int angle = m_points[i].angle;
 
         if (distance <= 80) {
             continue;
@@ -94,7 +94,7 @@ void LidarServer::calculateData(){
             nbFrontDistancePoints++;
         }
         else if (isFrontRightAnchorArc(angle)) {
-            if (distance < frontRightAnchorDistance) {
+            if (distance < frontRightAnchorDistance && cosDistanceWithReferenceAngle(angle, distance, 360) < 150) {
                 frontRightAnchorDistance = cosDistanceWithReferenceAngle(angle, distance, 360);
             }
 
@@ -127,7 +127,10 @@ void LidarServer::calculateData(){
         }
         else if (isLeftAnchorArc(angle)) {
             if (distance < leftAnchorDistance) {
-                leftAnchorDistance = distance;
+                if (lastLeftAnchorDistance == 0 || abs(lastLeftAnchorDistance - distance) < 30) {
+                    leftAnchorDistance = distance;
+                    lastLeftAnchorDistance = distance;
+                }
             }
             
             if (isLeftArc(angle)) {
