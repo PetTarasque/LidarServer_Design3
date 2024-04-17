@@ -42,7 +42,7 @@ bool isFrontRightAnchorArc(int angle){
 }
 
 bool isRightAnchorArc(int angle){
-    return angle > 285 || angle < 45;
+    return angle > 315 || angle < 45;
 }
 
 bool isBehindRightArc(int angle){
