@@ -126,11 +126,8 @@ void LidarServer::calculateData(){
             nbBehindRightDistancePoints++;
         }
         else if (isLeftAnchorArc(angle)) {
-            if (distance < leftAnchorDistance) {
-                if (lastLeftAnchorDistance == 0 || abs(lastLeftAnchorDistance - distance) < 30) {
-                    leftAnchorDistance = distance;
-                    lastLeftAnchorDistance = distance;
-                }
+            if (distance < leftAnchorDistance && distance > 325) {
+                leftAnchorDistance = distance;
             }
             
             if (isLeftArc(angle)) {
