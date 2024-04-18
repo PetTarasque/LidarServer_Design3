@@ -6,39 +6,46 @@
 #define UNTITLED1_LIDARSERVER_H
 
 #include <iostream>
-#include "Point.h"
+#include <map>
+#include <vector>
+#include "ldlidar_driver/ldlidar_driver_linux.h"
 
 using namespace std;
 
 class LidarServer {
 private:
-    vector<Point> m_points;
-    pair<int, int> right_arc = {300, 0};
-    pair<int, int> frontal_arc = {265, 275};
+
+    int frontDistance;
+    int frontRightDistance;
+    int rightDistance;
+    int behindRightDistance;
+    int rightFrontHalfDistance;
+    int rightBehindHalfDistance;
+    int leftDistance;
+    int leftBehindHalfDistance;
+    int rightWallDistance;
+    int frontWallDistance;
+
+    float deviationAngle;
+    float deviationAngleAlt;
+
+    int frontRightAnchorDistance = 800;
+    int leftAnchorDistance = 610;
+    int rightAnchorDistance = 610;
+    
+    ldlidar::Points2D m_points;
 
 public:
     map<string, double> detectObstacles();
-    void updatePoints(vector<Point> points);
+    void updatePoints(ldlidar::Points2D laser_scan_points);
 
-    //don't touch the following functions
-    void cleanValues();
-    void deleteValuesCollidingWithRobot();
-    void deleteAbhorrentValues();
-    pair<double, double> calculateRightWallPositions();
-    map<string, double> calculatePositions();
-
-    static double angleOfArc(pair<double, double> arc);
-    static pair<double, double> splitArcInSubInterval(pair<double, double> arc, int numberOfSections, int sectionSelected);
-    static Point calculateAveragePointOfArc(const std::vector<Point>& points);
-    vector<Point> getPoints();
-    vector<Point> getPointsInInterval(pair<int, int> arc);
-    static double calculateHeightTriangle(double A, double B, double angle);
-    static double calculateDeviation(double A, double B, double angleB, double angle);
-    static double moduloAngle(double angle);
-    static double angleBetweenArcs(pair<double, double> firstArc, pair<double, double> secondArc);
-    static double middleOfArc(pair<double, double> arc);
-    double calculateFrontWallDistance(double deviationAngle);
+    std::string getPositions();
+    void calculateData();
+    void resetValues();
+    std::string formatPositions();
+    void calculateDeviation();
+    void calculateRightWallDistance();
+    void calculateFrontWallDistance();
+    void calculateDeviationAngleAlt();
 };
-
-
 #endif //UNTITLED1_LIDARSERVER_H

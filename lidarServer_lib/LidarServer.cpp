@@ -10,193 +10,216 @@
 #include <map>
 #include <algorithm>
 #include <cmath>
+#include "ldlidar_driver/ldlidar_driver_linux.h"
 
 #include "LidarServer.h"
-
 
 using namespace std;
 
 
-void LidarServer::updatePoints(vector<Point> points){
-    m_points = std::move(points);;
+void LidarServer::updatePoints(ldlidar::Points2D laser_scan_points){
+    m_points = std::move(laser_scan_points);;
 }
 
-map<string, double> LidarServer::detectObstacles(){
-    cleanValues();
-    return calculatePositions();
+double toRadians(int angle){
+    return angle*M_PI/180;
 }
 
-vector<Point> LidarServer::getPoints(){
-    return m_points;
-};
-
-map<string, double> LidarServer::calculatePositions() {
-    map<string, double> positions;
-    pair<double, double> rightWallPositions = calculateRightWallPositions();
-    double deviationAngle = rightWallPositions.second;
-    positions["rightWall"] = rightWallPositions.first;
-    positions["frontWall"] = calculateFrontWallDistance(deviationAngle);
-    positions["cylinderDistance"] = 7432.4234;//To actually update
-    positions["angle"] = deviationAngle;
-    return positions;
+int cosDistanceWithReferenceAngle(int angle, int distance, int referenceAngle){
+    return (int) (distance * cos(toRadians(abs(referenceAngle - angle))));
 }
 
-void LidarServer::cleanValues(){
-    deleteAbhorrentValues();
-    deleteValuesCollidingWithRobot();
+bool isFrontArc(int angle){
+    return angle > 255 && angle < 285;
 }
 
-void LidarServer::deleteAbhorrentValues(){
-    //this deletes the m_points that are below 4 cm, as they are for sure irrelevant
-    m_points.erase(std::remove_if(m_points.begin(), m_points.end(), [&](const Point& point) {
-        if (point.distance < 10){
-            return true;
+bool isFrontRightArc(int angle){
+    return angle > 300 && angle < 330;
+}
+
+bool isFrontRightAnchorArc(int angle){
+    return angle > 270 && angle < 330;
+}
+
+bool isRightAnchorArc(int angle){
+    return angle > 315 || angle < 45;
+}
+
+bool isBehindRightArc(int angle){
+    return angle > 30 && angle < 60;
+}
+
+bool isLeftAnchorArc(int angle){
+    return angle > 135 && angle < 225;
+}
+
+bool isLeftArc(int angle){
+    return angle > 172.5 && angle < 187.5;
+}
+
+bool isBehindLeftArc(int angle){
+    return angle > 157.5 && angle < 172.5;
+}
+
+
+void LidarServer::calculateData(){
+    int nbFrontDistancePoints = 0;
+    int nbFrontRightDistancePoints = 0;
+    int nbRightDistancePoints = 0;
+    int nbBehindRightDistancePoints = 0;
+    int nbRightFrontHalfDistancePoints = 0;
+    int nbRightBehindHalfDistancePoints = 0;
+    int nbLeftDistancePoints = 0;
+    int nbLeftBehindHalfDistancePoints = 0;
+
+    int frontDistanceTotal = 0;
+    int frontRightDistanceTotal = 0;
+    int rightDistanceTotal = 0;
+    int behindRightDistanceTotal = 0;
+    int rightFrontHalfDistanceTotal = 0;
+    int rightBehindHalfDistanceTotal = 0;
+    int leftDistanceTotal = 0;
+    int leftBehindHalfDistanceTotal = 0;
+
+    for (int i = 0; i < m_points.size(); i++) {
+        int distance = m_points[i].distance;
+        int angle = m_points[i].angle;
+
+        if (distance <= 80) {
+            continue;
         }
-        return false;
-    }), m_points.end());
-};
+        
+        if (isFrontArc(angle)) {
+            frontDistanceTotal += cosDistanceWithReferenceAngle(angle, distance, 270);
+            nbFrontDistancePoints++;
+        }
+        else if (isFrontRightAnchorArc(angle)) {
+            if (distance < frontRightAnchorDistance && cosDistanceWithReferenceAngle(angle, distance, 360) < 150) {
+                frontRightAnchorDistance = cosDistanceWithReferenceAngle(angle, distance, 360);
+            }
 
-void LidarServer::deleteValuesCollidingWithRobot(){
-    //<angleIntervalStart, angleIntervalEnd, minimumDistance>
-    vector<tuple<double, double, int>> AnglesIntervals = {{15, 25, 60}, {48, 58, 120}, {122, 131, 120}, {175,185, 60}};
+            if (isFrontRightArc(angle)) {
+                frontRightDistanceTotal += cosDistanceWithReferenceAngle(angle, distance, 315);
+                nbFrontRightDistancePoints++;
+            } 
+        }
+        if (isRightAnchorArc(angle)) {
+            if (distance < rightAnchorDistance) {
+                rightAnchorDistance = distance;
+            }
 
-    m_points.erase(std::remove_if(m_points.begin(), m_points.end(), [&](const Point& point) {
-        for (const auto& rangeAndDist : AnglesIntervals) {
-            double minAngle = get<0>(rangeAndDist);
-            double maxAngle = get<1>(rangeAndDist);
-            double distance = get<2>(rangeAndDist);
-            if ((point.angle >= minAngle && point.angle <= maxAngle && point.distance < distance)) {
-                return true; // Delete if angle is within range and distance is below maxDistance
+            else if (angle > 345) {
+                rightDistanceTotal += cosDistanceWithReferenceAngle(angle, distance, 360);
+                rightFrontHalfDistanceTotal += cosDistanceWithReferenceAngle(angle, distance, 352.5);
+                nbRightDistancePoints++;
+                nbRightFrontHalfDistancePoints++;
+            }
+            else if (angle < 15) {
+                rightDistanceTotal += cosDistanceWithReferenceAngle(angle, distance, 0);
+                rightBehindHalfDistanceTotal += cosDistanceWithReferenceAngle(angle, distance, 7.5);
+                nbRightDistancePoints++;
+                nbRightBehindHalfDistancePoints++;
             }
         }
-        return false;
-    }), m_points.end());
-};
-
-Point LidarServer::calculateAveragePointOfArc(const std::vector<Point>& points) {
-    double distanceSum = 0.0;
-    double angleSum = 0.0;
-    for (const auto& point : points) {
-        distanceSum += point.distance;
-        angleSum += point.angle;
+        else if (isBehindRightArc(angle)) {
+            behindRightDistanceTotal += cosDistanceWithReferenceAngle(angle, distance, 45);
+            nbBehindRightDistancePoints++;
+        }
+        else if (isLeftAnchorArc(angle)) {
+            if (distance < leftAnchorDistance && distance > 335) {
+                leftAnchorDistance = distance;
+            }
+            
+            if (isLeftArc(angle)) {
+                leftDistanceTotal += cosDistanceWithReferenceAngle(angle, distance, 180);
+                nbLeftDistancePoints++;
+            }
+            else if (isBehindLeftArc(angle)) {
+                leftBehindHalfDistanceTotal += cosDistanceWithReferenceAngle(angle, distance, 165);
+                nbLeftBehindHalfDistancePoints++;
+            }
+        }
     }
-    Point pointAverage{};
-    points.empty() ? pointAverage.angle = 0.0, pointAverage.distance=0.0 :
-            pointAverage.angle = angleSum/points.size(), pointAverage.distance = distanceSum / points.size();
-    return pointAverage;
+
+    frontDistance = frontDistanceTotal / nbFrontDistancePoints;
+    frontRightDistance = frontRightDistanceTotal / nbFrontRightDistancePoints;
+    rightDistance = rightDistanceTotal / nbRightDistancePoints;
+    behindRightDistance = behindRightDistanceTotal / nbBehindRightDistancePoints;
+    rightFrontHalfDistance = rightFrontHalfDistanceTotal / nbRightFrontHalfDistancePoints;
+    rightBehindHalfDistance = rightBehindHalfDistanceTotal / nbRightBehindHalfDistancePoints;
+    leftDistance = leftDistanceTotal / nbLeftDistancePoints;
+    leftBehindHalfDistance = leftBehindHalfDistanceTotal / nbLeftBehindHalfDistancePoints;
 }
 
-double LidarServer::angleOfArc(pair<double, double> arc){
-    int startInterval = arc.first;
-    int endInterval = arc.second;
-    double Angle;
-    if (startInterval> endInterval){
-        Angle = (360 - startInterval) + endInterval;
-    } else {
-        Angle = endInterval - startInterval;
-    }
-    return Angle;
+void LidarServer::resetValues(){
+    frontDistance = 0;
+    frontRightDistance = 0;
+    rightDistance = 0;
+    behindRightDistance = 0;
+    rightFrontHalfDistance = 0;
+    rightBehindHalfDistance = 0;
+    leftDistance = 0;
+    leftBehindHalfDistance = 0;
+    rightWallDistance = 0;
+    frontWallDistance = 0;
+
+    deviationAngle = 0.0;
+    deviationAngleAlt = 0.0;
+
+    frontRightAnchorDistance = 800;
+    leftAnchorDistance = 610;
+    rightAnchorDistance = 610;
 }
 
-vector<Point> LidarServer::getPointsInInterval(pair<int, int> arc){
-    vector<Point> pointsOfInterval;
-    int startInterval = arc.first;
-    int endInterval = arc.second;
-    if(startInterval > endInterval){
-        //This distinction is necessary if for example the start of the interval is 345 and the end is 15
-        copy_if(m_points.begin(), m_points.end(), std::back_inserter(pointsOfInterval),
-                [&startInterval, &endInterval](const Point& point) { return point.angle >= startInterval || point.angle <= endInterval;});
-    } else {
-        copy_if(m_points.begin(), m_points.end(), std::back_inserter(pointsOfInterval),
-                [&startInterval, &endInterval](const Point& point) { return point.angle >= startInterval && point.angle <= endInterval;});
+void LidarServer::calculateDeviation(){
+    deviationAngle = atan((rightFrontHalfDistance * cos(toRadians(7.5)) - rightBehindHalfDistance * cos(toRadians(7.5))) / 
+                                    (rightFrontHalfDistance * sin(toRadians(7.5)) + rightBehindHalfDistance * sin(toRadians(7.5))));
+    if (isnan(deviationAngle)) {
+        deviationAngle = 0.0;
     }
-    return pointsOfInterval;
 }
 
-double LidarServer::moduloAngle(double angle){
-    while(angle >= 360){
-        angle -= 360;
-    }
-    if (angle < 0){
-        angle += 360;
-    }
-    return angle;
+void LidarServer::calculateRightWallDistance(){
+    rightWallDistance = rightDistance * cos(deviationAngle);
 }
 
-pair<double, double> LidarServer::splitArcInSubInterval(pair<double, double> arc, int numberOfSections, int sectionSelected){
-    //this function splits an angle in sections and returns the arc of that subsection
-    //ensure the section selected is within acceptable values
-    if(sectionSelected > numberOfSections){
-        sectionSelected = numberOfSections;
-        cerr << "The given sectionSelected was invalid : " <<sectionSelected<<endl;
-    } else if (sectionSelected < 1){
-        sectionSelected = 1;
-        cerr << "The given sectionSelected was invalid : " <<sectionSelected<<endl;
+void LidarServer::calculateFrontWallDistance(){
+     frontWallDistance = frontDistance * cos(deviationAngle);
+
+}
+
+void LidarServer::calculateDeviationAngleAlt(){
+    deviationAngleAlt = atan((leftBehindHalfDistance* cos(toRadians(15)) - leftDistance) / 
+                                        (leftBehindHalfDistance * sin(toRadians(15))));
+    if (isnan(deviationAngleAlt)) {
+        deviationAngleAlt = 0.0;
     }
-    double sizeOfSections = angleOfArc(arc)/numberOfSections;
-    double startOfSection = arc.first + (sectionSelected-1)*sizeOfSections;
-    double endOfSection = startOfSection + sizeOfSections;
-    return {moduloAngle(startOfSection), moduloAngle(endOfSection)};
 }
 
-double LidarServer::angleBetweenArcs(pair<double, double> firstArc, pair<double, double> secondArc){
-    double middleFirstArc = middleOfArc(firstArc);
-    double middleSecondArc = middleOfArc(secondArc);
-    return angleOfArc({middleFirstArc, middleSecondArc});
-};
-
-double LidarServer::middleOfArc(pair<double, double> arc){
-    if(arc.second < arc.first){
-        return moduloAngle((arc.first + arc.second +360)/2);
-    } else {
-        return (arc.first + arc.second)/2;
-    }
-};
-
-pair<double, double> LidarServer::calculateRightWallPositions() {
-    /** TODO
-     * should have a logic to deal with m_points that aren't valid.
-     * maybe have 3 triangles taken across the wall and compare them
-     * an arc sample should also verify if there's enough m_points for the sample, and if not, increase the aperture of the angle
-     * or take another point
-     */
-
-    vector<Point> filteredPoint = getPointsInInterval(right_arc);
-
-    pair<double, double> samplingForFirstPoint= splitArcInSubInterval(right_arc, 6, 2);
-    Point A = calculateAveragePointOfArc(getPointsInInterval(samplingForFirstPoint));
-
-    pair<double, double> samplingForSecondPoint= splitArcInSubInterval(right_arc, 6, 5);
-    Point B = calculateAveragePointOfArc(getPointsInInterval(samplingForSecondPoint));
-
-    double Angle = angleBetweenArcs(samplingForFirstPoint, samplingForSecondPoint);
-
-    double triangleHeight = calculateHeightTriangle(A.distance, B.distance, Angle);
-    double deviation = calculateDeviation(A.distance, B.distance, B.angle, Angle);
-
-    return {triangleHeight, deviation};
+std::string LidarServer::formatPositions(){
+    return std::string("{\"distanceFront\": ") + std::to_string(frontDistance - 60) + 
+                              std::string(", \"distanceFrontRight\": ") + std::to_string(frontRightDistance -  sqrt(pow(80, 2) + pow(60, 2))) + 
+                              std::string(", \"distanceRight\": ") + std::to_string(rightDistance - 80) + 
+                              std::string(", \"distanceBehindRight\": ") + std::to_string(behindRightDistance - sqrt(pow(80, 2) + pow(60, 2))) +
+                              std::string(", \"distanceRightWall\": ") + std::to_string(rightWallDistance - 80) +
+                              std::string(", \"distanceFrontWall\": ") + std::to_string(frontWallDistance - 60) +
+                              std::string(", \"distanceLeftAnchor\": ") + std::to_string(leftAnchorDistance - 80) + 
+                              std::string(", \"distanceRightAnchor\": ") + std::to_string(rightAnchorDistance - 80) + 
+                              std::string(", \"distanceFrontRightAnchor\": ") + std::to_string(frontRightAnchorDistance - 80) + 
+                              std::string(", \"deviationAngle\": ") + std::to_string(deviationAngle) +
+                              std::string(", \"deviationAngleAlt\": ") + std::to_string(deviationAngleAlt) + std::string("}");
+        
 }
 
-double LidarServer::calculateFrontWallDistance(double deviationAngle){
-    //this is the distance from the wall in front of the vehicle
-    pair<double, double> adjustedFrontalArc = {frontal_arc.first-deviationAngle, frontal_arc.second-deviationAngle};
-    vector<Point> frontalPoints = getPointsInInterval(adjustedFrontalArc);
-    Point pointAverage = calculateAveragePointOfArc(frontalPoints);
-    return pointAverage.distance;
-};
+std::string LidarServer::getPositions(){
+    calculateData();
 
-double LidarServer::calculateHeightTriangle(double A, double B, double angle){
-    double angleRadiant = angle * (M_PI / 180.0);
-    double Area = 0.5 * A * B * sin(angleRadiant);
-    double base = sqrt(A*A+ B*B- 2*A*B*cos(angleRadiant));
-    double heightOfTriangle = 2 * Area / base;
-    return heightOfTriangle;
-}
-
-double LidarServer::calculateDeviation(double A, double B, double angleB, double angle_AtoB){
-    double angleRadiant_AtoB = angle_AtoB * (M_PI / 180.0);
-    //we need to multiply by -1, because the Lidar has the positive angle going in a clockwise direction
-    double angleFromHeightToB = -1 * atan((A*cos(angleRadiant_AtoB)-B)/(A*sin(angleRadiant_AtoB))) * (180.0/M_PI);
-    double deviationAngle = angleFromHeightToB - angleB;
-    return moduloAngle(deviationAngle);
+    //calcuate Data before this part:
+    calculateDeviation();
+    calculateFrontWallDistance();
+    calculateRightWallDistance();
+    calculateDeviationAngleAlt();
+    std::string formatedPositions = formatPositions();
+    resetValues();
+    return formatedPositions;
 }

@@ -19,6 +19,4 @@ add_subdirectory(ldlidar_sdk)
 
 target_link_libraries(lidarServer_run lidarServer_lib)
 target_link_libraries(lidarServer_run ldlidar_driver)
-
-add_subdirectory(Google_tests)
-
+target_link_libraries(lidarServer_run pthread)
